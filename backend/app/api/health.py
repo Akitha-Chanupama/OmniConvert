@@ -1,0 +1,33 @@
+from fastapi import APIRouter
+from app.config import config
+from app.schemas.conversion import HealthResponse
+
+router = APIRouter(prefix="/health", tags=["Health"])
+
+@router.get("", response_model=HealthResponse)
+async def check_health():
+    """Returns application health and detected tool availability."""
+    lo_path = config.libreoffice_path
+    pandoc_path = config.pandoc_path
+    ffmpeg_path = config.ffmpeg_path
+
+    return HealthResponse(
+        status="ok",
+        version="1.0.0",
+        mode="local",
+        installed_tools={
+            "pillow": True,
+            "pypdf": True,
+            "openpyxl": True,
+            "pyyaml": True,
+            "defusedxml": True,
+            "libreoffice": lo_path is not None,
+            "pandoc": pandoc_path is not None,
+            "ffmpeg": ffmpeg_path is not None,
+        },
+        tool_paths={
+            "libreoffice": lo_path,
+            "pandoc": pandoc_path,
+            "ffmpeg": ffmpeg_path,
+        },
+    )
