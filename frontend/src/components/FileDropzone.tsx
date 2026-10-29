@@ -12,19 +12,16 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     if (!disabled) setIsDragOver(true);
   }, [disabled]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragOver(false);
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragOver(false);
 
     if (disabled) return;
