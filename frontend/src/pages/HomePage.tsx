@@ -72,6 +72,9 @@ export const HomePage: React.FC<HomePageProps> = ({
     downloadUrl: string;
     fileSizeBytes?: number;
     isOpen: boolean;
+    originalUrl?: string;
+    originalSizeBytes?: number;
+    originalFilename?: string;
   } | null>(null);
 
   // Load formats on mount
@@ -114,7 +117,12 @@ export const HomePage: React.FC<HomePageProps> = ({
     const items: UploadedFileItem[] = newFiles.map((file) => {
       const ext = getFileExtension(file.name);
       let previewUrl: string | undefined;
-      if (file.type.startsWith('image/')) {
+      const isImg =
+        file.type.startsWith('image/') ||
+        ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'gif', 'svg', 'ico', 'avif', 'tiff'].includes(
+          ext.toLowerCase()
+        );
+      if (isImg) {
         previewUrl = URL.createObjectURL(file);
       }
       return {
@@ -301,6 +309,9 @@ export const HomePage: React.FC<HomePageProps> = ({
       setConversionResult(combinedRes);
 
       // Add to session history
+      const matchingFile = files.find(
+        (f) => f.name.toLowerCase() === allItems[0]?.original_filename?.toLowerCase()
+      );
       const historyEntry: ConversionHistoryItem = {
         id: combinedRes.conversion_id,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -313,6 +324,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         downloadUrl: combinedRes.download_url,
         fileSizeBytes: allItems.reduce((acc, curr) => acc + curr.file_size_bytes, 0),
         isZip: combinedRes.is_zip,
+        originalSizeBytes: matchingFile?.size,
+        originalUrl: matchingFile?.previewUrl,
+        originalFilename: matchingFile?.name,
       };
       setHistory((prev) => [historyEntry, ...prev.slice(0, 9)]);
     } catch (err: any) {
@@ -334,11 +348,18 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   const handlePreviewConverted = (item: ConvertedFileInfo) => {
+    const originalFile = files.find(
+      (f) => f.name.toLowerCase() === item.original_filename.toLowerCase()
+    );
+
     setPreviewModal({
       filename: item.converted_filename,
       downloadUrl: item.download_url,
       fileSizeBytes: item.file_size_bytes,
       isOpen: true,
+      originalUrl: originalFile?.previewUrl,
+      originalSizeBytes: originalFile?.size,
+      originalFilename: originalFile?.name || item.original_filename,
     });
   };
 
@@ -497,6 +518,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               result={conversionResult}
               onReset={handleReset}
               onPreview={handlePreviewConverted}
+              originalFiles={files}
             />
           ) : (
             <ConversionSettings
@@ -560,6 +582,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                               downloadUrl: item.downloadUrl,
                               fileSizeBytes: item.fileSizeBytes,
                               isOpen: true,
+                              originalUrl: item.originalUrl,
+                              originalSizeBytes: item.originalSizeBytes,
+                              originalFilename: item.originalFilename,
                             })
                           }
                           className="p-1.5 text-slate-500 hover:text-blue-600 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
@@ -585,7 +610,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </div>
 
-      {/* Global Preview Modal */}
+      {/* Global Preview Modal with Before / After Image Compression Comparison */}
       {previewModal && (
         <PreviewModal
           filename={previewModal.filename}
@@ -593,6 +618,9 @@ export const HomePage: React.FC<HomePageProps> = ({
           fileSizeBytes={previewModal.fileSizeBytes}
           isOpen={previewModal.isOpen}
           onClose={() => setPreviewModal(null)}
+          originalUrl={previewModal.originalUrl}
+          originalSizeBytes={previewModal.originalSizeBytes}
+          originalFilename={previewModal.originalFilename}
         />
       )}
     </div>
