@@ -82,8 +82,8 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
           )}
         </div>
 
-        <div className="space-y-1.5 max-w-md">
-          <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+        <div className="space-y-2 max-w-md">
+          <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
             {isDragOver ? (
               'Drop files to upload instantly'
             ) : (
@@ -95,17 +95,17 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
               </>
             )}
           </p>
-          <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">
-            Supports multiple files. Press <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-mono text-slate-600 dark:text-slate-300">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-mono text-slate-600 dark:text-slate-300">V</kbd> to paste from clipboard.
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Supports multiple files. Press <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-700 dark:text-slate-300">Ctrl</kbd> + <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-700 dark:text-slate-300">V</kbd> to paste from clipboard.
           </p>
         </div>
 
         {/* Supported Format Pills */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-[11px] font-bold text-slate-600 dark:text-slate-400">
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
           {['JPG', 'PNG', 'WEBP', 'PDF', 'DOCX', 'XLSX', 'CSV', 'JSON'].map((fmt) => (
             <span
               key={fmt}
-              className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800/90 rounded-lg border border-slate-200/80 dark:border-slate-700/80"
+              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80"
             >
               {fmt}
             </span>

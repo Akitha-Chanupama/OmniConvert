@@ -352,17 +352,17 @@ export const HomePage: React.FC<HomePageProps> = ({
                   <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                     Select or Drop Files
                   </h2>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-sm text-slate-400 dark:text-slate-500">
                     Upload one or more files to convert in parallel or merge
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300">
+                <span className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300">
                   {files.length} file{files.length === 1 ? '' : 's'} selected
                 </span>
                 {files.length > 0 && (
