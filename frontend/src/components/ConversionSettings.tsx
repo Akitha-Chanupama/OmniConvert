@@ -3,6 +3,7 @@ import {
   Settings,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import type { ConversionOptions } from '../types';
 
@@ -66,15 +67,15 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <Settings className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
+            <Settings className="w-5 h-5" />
           </div>
-          <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white">
+          <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">
             Conversion Settings
           </h3>
         </div>
 
-        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-3 py-1.5 rounded-full">
+        <span className="font-display text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-3 py-1.5 rounded-full">
           {filesCount > 0 ? 'Ready to Configure' : 'Waiting for files'}
         </span>
       </div>
@@ -82,7 +83,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       {/* Output Format 8-Grid */}
       <div className="space-y-2.5">
         <div>
-          <label className="text-sm font-bold text-slate-900 dark:text-white block">
+          <label className="font-display text-sm font-bold text-slate-900 dark:text-white block">
             Output Format
           </label>
           <span className="text-xs text-slate-400 dark:text-slate-500">
@@ -103,9 +104,9 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
                 type="button"
                 onClick={() => isSupported && onSelectTarget(fmt)}
                 disabled={disabled || !isSupported}
-                className={`py-3 px-3 rounded-xl text-sm font-bold uppercase transition-all cursor-pointer ${
+                className={`py-3 px-3 rounded-xl font-display text-sm font-bold uppercase transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-600 scale-[1.02]'
+                    ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/35 ring-2 ring-blue-500/40 scale-[1.02]'
                     : isSupported
                     ? 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
                     : 'bg-slate-50 dark:bg-slate-900 text-slate-300 dark:text-slate-700 border border-slate-100 dark:border-slate-800/50 cursor-not-allowed opacity-50'
@@ -218,7 +219,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       {isImageTarget && (
         <div className="space-y-2 pt-1">
           <div>
-            <label className="text-sm font-bold text-slate-900 dark:text-white block">
+            <label className="font-display text-sm font-bold text-slate-900 dark:text-white block">
               Resize Dimensions (Optional)
             </label>
             <span className="text-xs text-slate-400 dark:text-slate-500">
@@ -309,7 +310,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           type="button"
           onClick={onConvert}
           disabled={disabled || filesCount === 0 || !selectedTarget || isConverting}
-          className="w-full py-4 px-6 font-bold rounded-2xl flex items-center justify-center space-x-2 text-base transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed select-none bg-[#0c1427] dark:bg-blue-600 hover:bg-[#152140] dark:hover:bg-blue-500 text-white shadow-blue-600/20"
+          className="w-full py-4 px-6 font-display font-bold rounded-2xl flex items-center justify-center space-x-2.5 text-base transition-all cursor-pointer shadow-lg disabled:opacity-50 disabled:cursor-not-allowed select-none bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 text-white shadow-blue-600/25 ring-1 ring-white/20 active:scale-[0.99]"
         >
           {isConverting ? (
             <>
@@ -318,10 +319,11 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
             </>
           ) : (
             <>
+              <Sparkles className="w-4.5 h-4.5 text-blue-200" />
               <span>
                 Convert {filesCount > 0 ? `${filesCount} File${filesCount > 1 ? 's' : ''}` : ''} Now
               </span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4.5 h-4.5" />
             </>
           )}
         </button>

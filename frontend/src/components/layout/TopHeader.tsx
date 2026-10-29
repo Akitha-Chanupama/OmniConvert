@@ -81,7 +81,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search for a tool..."
+              placeholder="Search for a tool (e.g. PDF, Image, Markdown)..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -143,7 +143,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         </button>
 
         {/* Live Engine Status Badge */}
-        <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/70 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-400 shadow-2xs">
+        <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/70 rounded-full text-xs font-semibold font-display font-bold text-emerald-700 dark:text-emerald-400 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="hidden sm:inline">Local Engine (127.0.0.1:8000)</span>
           <span className="sm:hidden">127.0.0.1:8000</span>

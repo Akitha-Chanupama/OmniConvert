@@ -36,6 +36,8 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'image',
     title: 'IMAGE CONVERSION',
     icon: ImageIcon,
+    accentColor: 'text-rose-400',
+    dotBg: 'bg-rose-500',
     tools: [
       { id: 'jpg-to-png', label: 'JPG to PNG', source: 'JPG', target: 'PNG' },
       { id: 'png-to-jpg', label: 'PNG to JPG', source: 'PNG', target: 'JPG' },
@@ -47,6 +49,8 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'pdf',
     title: 'PDF TOOLS',
     icon: Layers,
+    accentColor: 'text-violet-400',
+    dotBg: 'bg-violet-500',
     tools: [
       { id: 'pdf-to-md', label: 'PDF to Markdown', source: 'PDF', target: 'MD' },
       { id: 'pdf-to-jpg', label: 'PDF to JPG', source: 'PDF', target: 'JPG' },
@@ -59,6 +63,8 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'document',
     title: 'DOCUMENT CONVERTER',
     icon: FileText,
+    accentColor: 'text-indigo-400',
+    dotBg: 'bg-indigo-500',
     tools: [
       { id: 'md-to-pdf', label: 'MD to PDF', source: 'MD', target: 'PDF' },
       { id: 'docx-to-pdf', label: 'DOCX to PDF', source: 'DOCX', target: 'PDF' },
@@ -70,6 +76,8 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'spreadsheet',
     title: 'SPREADSHEET CONVERTER',
     icon: FileSpreadsheet,
+    accentColor: 'text-emerald-400',
+    dotBg: 'bg-emerald-500',
     tools: [
       { id: 'xlsx-to-csv', label: 'XLSX to CSV', source: 'XLSX', target: 'CSV' },
       { id: 'csv-to-xlsx', label: 'CSV to XLSX', source: 'CSV', target: 'XLSX' },
@@ -79,6 +87,8 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'data',
     title: 'DATA CONVERTER',
     icon: FileCode,
+    accentColor: 'text-amber-400',
+    dotBg: 'bg-amber-500',
     tools: [
       { id: 'json-to-csv', label: 'JSON to CSV', source: 'JSON', target: 'CSV' },
       { id: 'csv-to-json', label: 'CSV to JSON', source: 'CSV', target: 'JSON' },
@@ -120,19 +130,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className="flex items-center space-x-3 cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <ArrowLeftRight className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all">
+              <ArrowLeftRight className="w-5 h-5 drop-shadow-xs" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-lg text-white tracking-tight">
+                <span className="font-display font-extrabold text-xl text-white tracking-tight">
                   OmniConvert
                 </span>
-                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-blue-950/80 text-blue-400 border border-blue-800/60">
+                <span className="font-display px-2 py-0.5 text-[10px] font-black rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30">
                   v1.0
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium">Local File Suite</p>
+              <p className="text-xs text-slate-400 font-medium">Personal Local File Suite</p>
             </div>
           </div>
 
@@ -156,9 +166,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onSelectDashboard();
                 onCloseMobile();
               }}
-              className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${
+              className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-display font-bold text-sm transition-all cursor-pointer ${
                 activeTab === 'convert' && !selectedPreset
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30 ring-1 ring-white/10'
                   : 'text-slate-300 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -172,7 +182,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             const Icon = group.icon;
             return (
               <div key={group.category} className="space-y-1.5">
-                <div className="px-3.5 text-xs font-bold tracking-wider text-slate-400 uppercase flex items-center space-x-1.5">
+                <div className="px-3.5 text-xs font-display font-bold tracking-wider text-slate-400 uppercase flex items-center space-x-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${group.dotBg}`} />
                   <span>{group.title}</span>
                 </div>
 
@@ -189,18 +200,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           onSelectTool(tool.source, tool.target, tool.action);
                           onCloseMobile();
                         }}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-semibold transition-all cursor-pointer group ${
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-display font-medium transition-all cursor-pointer group ${
                           isSelected
-                            ? 'bg-blue-600/90 text-white shadow-sm shadow-blue-600/20'
+                            ? 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-sm shadow-blue-600/25 ring-1 ring-white/10'
                             : 'text-slate-300 hover:bg-white/5 hover:text-white'
                         }`}
                       >
                         <div className="flex items-center space-x-2.5">
-                          <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`} />
+                          <Icon
+                            className={`w-4 h-4 transition-transform group-hover:scale-110 ${
+                              isSelected
+                                ? 'text-white'
+                                : `${group.accentColor} group-hover:text-white`
+                            }`}
+                          />
                           <span>{tool.label}</span>
                         </div>
                         {isSelected && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
                         )}
                       </button>
                     );
@@ -219,9 +236,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSelectSettings();
               onCloseMobile();
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-display text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'settings'
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30'
                 : 'text-slate-300 hover:bg-white/5 hover:text-white'
             }`}
           >

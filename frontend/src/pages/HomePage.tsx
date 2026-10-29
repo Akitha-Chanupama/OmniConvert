@@ -348,11 +348,11 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
                   <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white">
                     Select or Drop Files
                   </h2>
                   <p className="text-sm text-slate-400 dark:text-slate-500">
@@ -362,7 +362,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300">
+                <span className="font-display px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80">
                   {files.length} file{files.length === 1 ? '' : 's'} selected
                 </span>
                 {files.length > 0 && (
