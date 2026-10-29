@@ -162,9 +162,9 @@ class ConversionRegistry:
             FormatCapability(
                 source_format="pdf",
                 category="pdf",
-                supported_targets=["txt", "pdf"] + (["jpg", "png", "webp"] if HAS_PDFIUM else []),
+                supported_targets=["txt", "pdf", "md"] + (["jpg", "png", "webp"] if HAS_PDFIUM else []),
                 is_enabled=True,
-                description="PDF Document (text extraction, page rendering, split, rotate, merge)",
+                description="PDF Document (text extraction, markdown conversion, page rendering, split, rotate, merge)",
             ),
             # Office Documents
             FormatCapability(
