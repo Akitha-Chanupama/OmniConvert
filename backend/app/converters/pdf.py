@@ -20,7 +20,7 @@ except Exception:
     HAS_PDFIUM = False
 
 class PDFConverter(BaseConverter):
-    SUPPORTED_INPUTS: Set[str] = {"pdf", "txt"}
+    SUPPORTED_INPUTS: Set[str] = {"pdf", "txt", "md"}
     SUPPORTED_OUTPUTS: Set[str] = {"pdf", "txt", "jpg", "jpeg", "png", "webp", "md"}
 
     def can_convert(self, source_ext: str, target_ext: str) -> bool:
@@ -34,6 +34,7 @@ class PDFConverter(BaseConverter):
             ("pdf", "txt"),
             ("pdf", "md"),
             ("txt", "pdf"),
+            ("md", "pdf"),
             ("pdf", "pdf"),  # for rotate, split, merge, page range
         }
         return (s, t) in valid_pairs
@@ -128,6 +129,73 @@ class PDFConverter(BaseConverter):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "wb") as f_out:
             writer.write(f_out)
+
+        return output_path
+
+    def convert_md_to_pdf(
+        self,
+        input_path: Path,
+        output_path: Path,
+        options: Optional[ConversionOptions] = None,
+    ) -> Path:
+        """Converts Markdown file to a styled multi-page PDF document using PyMuPDF Story."""
+        with open(input_path, "r", encoding="utf-8", errors="replace") as f:
+            md_content = f.read()
+
+        try:
+            import markdown
+            html_body = markdown.markdown(
+                md_content,
+                extensions=["tables", "fenced_code", "nl2br"]
+            )
+        except Exception:
+            escaped = (
+                md_content.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+            )
+            paragraphs = escaped.split("\n\n")
+            html_body = "\n".join(f"<p>{p.replace('\n', '<br>')}</p>" for p in paragraphs if p.strip())
+
+        styled_html = f"""
+        <style>
+        body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.6; color: #1e293b; }}
+        h1 {{ font-size: 18pt; color: #0f172a; margin-bottom: 10pt; border-bottom: 1.5pt solid #cbd5e1; padding-bottom: 4pt; }}
+        h2 {{ font-size: 13pt; color: #1e293b; margin-top: 12pt; margin-bottom: 6pt; }}
+        h3 {{ font-size: 11pt; color: #334155; margin-top: 10pt; margin-bottom: 4pt; }}
+        p {{ margin-bottom: 6pt; }}
+        ul, ol {{ margin-top: 2pt; margin-bottom: 6pt; padding-left: 18pt; }}
+        li {{ margin-bottom: 3pt; }}
+        code {{ font-family: Courier, monospace; font-size: 9pt; background-color: #f1f5f9; padding: 1pt 3pt; }}
+        pre {{ background-color: #0f172a; color: #f8fafc; padding: 8pt; font-family: Courier, monospace; font-size: 8.5pt; line-height: 1.4; margin-bottom: 8pt; }}
+        table {{ border-collapse: collapse; width: 100%; margin-top: 6pt; margin-bottom: 8pt; font-size: 9pt; }}
+        th {{ background-color: #f1f5f9; font-weight: bold; text-align: left; padding: 4pt 6pt; border: 1pt solid #cbd5e1; }}
+        td {{ padding: 4pt 6pt; border: 1pt solid #e2e8f0; }}
+        blockquote {{ border-left: 3pt solid #6366f1; padding-left: 8pt; color: #475569; font-style: italic; margin: 6pt 0; }}
+        hr {{ border: none; border-top: 1pt solid #e2e8f0; margin: 10pt 0; }}
+        </style>
+        {html_body}
+        """
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            import pymupdf
+            doc_writer = pymupdf.DocumentWriter(str(output_path))
+            story = pymupdf.Story(html=styled_html)
+            page_rect = pymupdf.Rect(0, 0, 612, 792)  # Standard Letter
+            story_rect = pymupdf.Rect(54, 54, 558, 738)  # 0.75in margins
+            more = 1
+            page_count = 0
+            while more and page_count < 200:
+                dev = doc_writer.begin_page(page_rect)
+                more, _ = story.place(story_rect)
+                story.draw(dev)
+                doc_writer.end_page()
+                page_count += 1
+            doc_writer.close()
+        except Exception:
+            self.convert_txt_to_pdf(input_path, output_path)
 
         return output_path
 
@@ -334,6 +402,8 @@ class PDFConverter(BaseConverter):
 
         if s == "txt" and t == "pdf":
             self.convert_txt_to_pdf(input_path, output_path)
+        elif s == "md" and t == "pdf":
+            self.convert_md_to_pdf(input_path, output_path, options)
         elif s == "pdf" and t == "txt":
             self.convert_pdf_to_txt(input_path, output_path)
         elif s == "pdf" and t == "md":

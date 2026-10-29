@@ -6,6 +6,7 @@ import {
   FileText,
   FileSpreadsheet,
   Database,
+  FileCode,
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -18,6 +19,24 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   onNavigateToTools,
 }) => {
   const actions = [
+    {
+      id: 'pdf-md',
+      label: 'PDF → MD',
+      source: 'PDF',
+      target: 'MD',
+      icon: FileCode,
+      iconColor: 'text-violet-500',
+      bgColor: 'bg-violet-50 dark:bg-violet-950/40',
+    },
+    {
+      id: 'md-pdf',
+      label: 'MD → PDF',
+      source: 'MD',
+      target: 'PDF',
+      icon: FileText,
+      iconColor: 'text-indigo-500',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-950/40',
+    },
     {
       id: 'img-pdf',
       label: 'Image → PDF',
@@ -33,8 +52,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       source: 'PDF',
       target: 'JPG',
       icon: FileText,
-      iconColor: 'text-indigo-500',
-      bgColor: 'bg-indigo-50 dark:bg-indigo-950/40',
+      iconColor: 'text-sky-500',
+      bgColor: 'bg-sky-50 dark:bg-sky-950/40',
     },
     {
       id: 'excel-csv',
@@ -44,15 +63,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       icon: FileSpreadsheet,
       iconColor: 'text-emerald-500',
       bgColor: 'bg-emerald-50 dark:bg-emerald-950/40',
-    },
-    {
-      id: 'jpg-png',
-      label: 'JPG → PNG',
-      source: 'JPG',
-      target: 'PNG',
-      icon: ImageIcon,
-      iconColor: 'text-blue-500',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/40',
     },
     {
       id: 'json-csv',
@@ -78,7 +88,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               Popular Quick Actions
             </h3>
             <p className="text-[11px] text-slate-400 dark:text-slate-500">
-              All processing happens locally on your machine. No data is uploaded to any server.
+              One-click setup for common conversion presets
             </p>
           </div>
         </div>
@@ -87,16 +97,16 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
           <button
             type="button"
             onClick={onNavigateToTools}
-            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center space-x-1 cursor-pointer self-start sm:self-auto group"
+            className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white inline-flex items-center space-x-1 cursor-pointer transition-colors self-start sm:self-auto"
           >
             <span>View all tools</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
-      {/* Action Pills Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+      {/* Action Buttons Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
         {actions.map((act) => {
           const Icon = act.icon;
           return (
@@ -104,14 +114,21 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               key={act.id}
               type="button"
               onClick={() => onSelectAction(act.source, act.target)}
-              className="flex items-center space-x-2.5 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/70 hover:bg-blue-50/70 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-blue-300 dark:hover:border-blue-600/80 rounded-2xl transition-all cursor-pointer group text-left"
+              className="group flex items-center p-3 rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-all cursor-pointer text-left space-x-3"
             >
-              <div className={`w-7 h-7 rounded-lg ${act.bgColor} ${act.iconColor} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
-                <Icon className="w-3.5 h-3.5" />
+              <div
+                className={`w-9 h-9 rounded-xl ${act.bgColor} ${act.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-105`}
+              >
+                <Icon className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">
-                {act.label}
-              </span>
+              <div className="min-w-0 flex-1">
+                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white">
+                  {act.label}
+                </span>
+                <span className="block text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Preset
+                </span>
+              </div>
             </button>
           );
         })}
@@ -119,4 +136,3 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     </div>
   );
 };
-

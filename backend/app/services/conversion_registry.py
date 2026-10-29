@@ -104,9 +104,9 @@ class ConversionRegistry:
             FormatCapability(
                 source_format="md",
                 category="text",
-                supported_targets=["html", "txt"],
+                supported_targets=["html", "txt", "pdf"],
                 is_enabled=True,
-                description="Markdown Document",
+                description="Markdown Document (styled PDF, HTML, or plain text)",
             ),
             FormatCapability(
                 source_format="html",
