@@ -83,7 +83,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+    <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center space-x-3">
@@ -121,7 +121,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               key={act.id}
               type="button"
               onClick={() => onSelectAction(act.source, act.target)}
-              className="group relative flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700/60 hover:shadow-md transition-all cursor-pointer text-left overflow-hidden"
+              className="group relative flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700/60 ring-1 ring-black/[0.02] dark:ring-white/[0.04] hover:shadow-md transition-all cursor-pointer text-left overflow-hidden"
             >
               <div className="flex items-center space-x-3.5 min-w-0 flex-1">
                 <div

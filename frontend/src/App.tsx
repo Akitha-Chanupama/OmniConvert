@@ -4,6 +4,8 @@ import { TopHeader } from './components/layout/TopHeader';
 import { HomePage } from './pages/HomePage';
 import { ToolsPage } from './pages/ToolsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { CommandPalette } from './components/CommandPalette';
+import { GlobalDropOverlay } from './components/GlobalDropOverlay';
 import { ShieldCheck } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -13,6 +15,12 @@ export const App: React.FC = () => {
   const [presetAction, setPresetAction] = useState<'convert' | 'merge_pdf' | 'split_pdf' | null>(null);
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Cross-component communication for drag-and-drop & queue control
+  const [droppedFiles, setDroppedFiles] = useState<File[] | null>(null);
+  const [queueCount, setQueueCount] = useState<number>(0);
+  const [clearQueueTrigger, setClearQueueTrigger] = useState<number>(0);
 
   const [isDark, setIsDark] = useState<boolean>(() => {
     return localStorage.getItem('omniconvert_theme') === 'dark';
@@ -27,6 +35,26 @@ export const App: React.FC = () => {
       localStorage.setItem('omniconvert_theme', 'light');
     }
   }, [isDark]);
+
+  // Global Keyboard Shortcuts (Ctrl + K or / to trigger Command Palette)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '') &&
+        !(document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
@@ -63,12 +91,37 @@ export const App: React.FC = () => {
     setActiveTab('convert');
   };
 
+  const handleGlobalFilesDropped = (files: File[]) => {
+    setDroppedFiles(files);
+    setActiveTab('convert');
+  };
+
   return (
     <div
-      className={`min-h-screen flex font-sans transition-colors duration-200 ${
+      className={`min-h-screen flex font-sans transition-colors duration-200 ambient-mesh ${
         isDark ? 'bg-[#070b16] text-slate-100' : 'bg-[#f4f6fa] text-slate-900'
       }`}
     >
+      {/* Global Full-Screen Drag & Drop Aura Overlay */}
+      <GlobalDropOverlay onFilesDropped={handleGlobalFilesDropped} />
+
+      {/* Spotlight Command Palette Modal */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTool={handleSelectToolPreset}
+        onToggleTheme={toggleTheme}
+        isDark={isDark}
+        onNavigateToDashboard={handleSelectDashboard}
+        onNavigateToTools={() => {
+          setActiveTab('tools');
+          setSelectedPresetId(null);
+        }}
+        onNavigateToSettings={handleSelectSettings}
+        onClearQueue={() => setClearQueueTrigger((prev) => prev + 1)}
+        hasQueueFiles={queueCount > 0}
+      />
+
       {/* Persistent Left Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -88,6 +141,7 @@ export const App: React.FC = () => {
           onToggleTheme={toggleTheme}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onSelectTool={handleSelectToolPreset}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
 
         {/* Content Canvas */}
@@ -103,6 +157,10 @@ export const App: React.FC = () => {
                 setPresetSource(null);
                 setPresetAction(null);
               }}
+              externalFiles={droppedFiles}
+              onClearExternalFiles={() => setDroppedFiles(null)}
+              onQueueChange={setQueueCount}
+              clearQueueTrigger={clearQueueTrigger}
             />
           )}
 

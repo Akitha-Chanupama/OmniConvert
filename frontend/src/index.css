@@ -27,3 +27,18 @@
     letter-spacing: -0.025em;
   }
 }
+
+/* Ambient Radial Mesh Backgrounds for Studio Canvas */
+.ambient-mesh {
+  background-image: 
+    radial-gradient(ellipse 75% 45% at 50% -5%, rgba(59, 130, 246, 0.08), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 12%, rgba(139, 92, 246, 0.05), transparent 60%);
+  background-attachment: fixed;
+}
+
+.dark .ambient-mesh {
+  background-image: 
+    radial-gradient(ellipse 75% 45% at 50% -5%, rgba(99, 102, 241, 0.13), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 12%, rgba(59, 130, 246, 0.08), transparent 60%);
+  background-attachment: fixed;
+}

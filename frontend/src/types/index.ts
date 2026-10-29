@@ -70,6 +70,7 @@ export interface UploadedFileItem {
   size: number;
   detectedExt: string;
   previewUrl?: string;
+  customTarget?: string;
 }
 
 export interface ConversionHistoryItem {

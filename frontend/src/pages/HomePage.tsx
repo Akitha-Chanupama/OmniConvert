@@ -32,6 +32,10 @@ interface HomePageProps {
   presetSource?: string | null;
   presetAction?: 'convert' | 'merge_pdf' | 'split_pdf' | null;
   onClearPreset?: () => void;
+  externalFiles?: File[] | null;
+  onClearExternalFiles?: () => void;
+  onQueueChange?: (count: number) => void;
+  clearQueueTrigger?: number;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
@@ -40,6 +44,10 @@ export const HomePage: React.FC<HomePageProps> = ({
   presetSource,
   presetAction,
   onClearPreset,
+  externalFiles,
+  onClearExternalFiles,
+  onQueueChange,
+  clearQueueTrigger,
 }) => {
   const [formatsData, setFormatsData] = useState<FormatsResponse | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -124,6 +132,26 @@ export const HomePage: React.FC<HomePageProps> = ({
     setConversionError(null);
   };
 
+  // Consume external files dropped via GlobalDropOverlay
+  useEffect(() => {
+    if (externalFiles && externalFiles.length > 0) {
+      handleFilesSelected(externalFiles);
+      onClearExternalFiles?.();
+    }
+  }, [externalFiles, onClearExternalFiles]);
+
+  // Notify parent of queue count
+  useEffect(() => {
+    onQueueChange?.(files.length);
+  }, [files.length, onQueueChange]);
+
+  // Respond to clearQueueTrigger from Command Palette
+  useEffect(() => {
+    if (clearQueueTrigger && clearQueueTrigger > 0) {
+      handleClearAll();
+    }
+  }, [clearQueueTrigger]);
+
   // Clipboard Paste support (Ctrl + V)
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
@@ -164,6 +192,13 @@ export const HomePage: React.FC<HomePageProps> = ({
     });
   };
 
+  // Select target format for an individual file
+  const handleSelectFileTarget = (fileId: string, newTarget: string) => {
+    setFiles((prev) =>
+      prev.map((f) => (f.id === fileId ? { ...f, customTarget: newTarget.toUpperCase() } : f))
+    );
+  };
+
   // Remove individual file
   const handleRemoveFile = (id: string) => {
     setFiles((prev) => {
@@ -186,7 +221,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     setConversionError(null);
   };
 
-  // Determine available target formats
+  // Determine available target formats (intersect across queue)
   const availableTargets: string[] = React.useMemo(() => {
     if (!formatsData || files.length === 0) return [];
 
@@ -218,36 +253,66 @@ export const HomePage: React.FC<HomePageProps> = ({
     );
   const canMergeIntoPdf = (isMultiPdf || isMultiImage) && selectedTarget.toUpperCase() === 'PDF';
 
-  // Trigger conversion
+  // Trigger conversion (supports unified batch or per-file multi-format parallel conversion)
   const handleConvert = async () => {
-    if (files.length === 0 || !selectedTarget) return;
+    if (files.length === 0) return;
 
     setIsConverting(true);
     setConversionError(null);
 
     try {
-      const rawFiles = files.map((f) => f.file);
-      const shouldMerge = mergePdf && canMergeIntoPdf;
+      // Group files by effective target
+      const groups: { [target: string]: File[] } = {};
+      for (const f of files) {
+        const tgt = (f.customTarget || selectedTarget || 'PDF').toLowerCase();
+        if (!groups[tgt]) groups[tgt] = [];
+        groups[tgt].push(f.file);
+      }
 
-      const res = await ConversionApi.convertFiles(
-        rawFiles,
-        selectedTarget.toLowerCase(),
-        options,
-        shouldMerge
+      const uniqueTargets = Object.keys(groups);
+      if (uniqueTargets.length === 0) {
+        throw new Error('Please select an output format.');
+      }
+
+      const shouldMerge =
+        mergePdf && canMergeIntoPdf && uniqueTargets.length === 1 && uniqueTargets[0] === 'pdf';
+
+      // Execute conversions in parallel for each target group
+      const results = await Promise.all(
+        uniqueTargets.map((tgt) =>
+          ConversionApi.convertFiles(groups[tgt], tgt, options, shouldMerge)
+        )
       );
-      setConversionResult(res);
+
+      const allItems = results.flatMap((r) => r.items);
+      const combinedRes: BatchConversionResponse = {
+        success: results.every((r) => r.success),
+        message:
+          results.length === 1
+            ? results[0].message
+            : `Successfully converted ${allItems.length} file(s) across ${results.length} format types.`,
+        conversion_id: results[0].conversion_id,
+        is_zip: results.length === 1 ? results[0].is_zip : false,
+        download_url:
+          results.length === 1 ? results[0].download_url : allItems[0]?.download_url || '',
+        items: allItems,
+      };
+
+      setConversionResult(combinedRes);
 
       // Add to session history
       const historyEntry: ConversionHistoryItem = {
-        id: res.conversion_id,
+        id: combinedRes.conversion_id,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         originalNames: files.map((f) => f.name),
         convertedFilename:
-          res.items.length === 1 ? res.items[0].converted_filename : 'converted_files.zip',
-        targetFormat: selectedTarget.toUpperCase(),
-        downloadUrl: res.download_url,
-        fileSizeBytes: res.items.reduce((acc, curr) => acc + curr.file_size_bytes, 0),
-        isZip: res.is_zip,
+          allItems.length === 1
+            ? allItems[0].converted_filename
+            : `${files[0].name.split('.')[0]}_converted_batch`,
+        targetFormat: uniqueTargets.map((t) => t.toUpperCase()).join(', '),
+        downloadUrl: combinedRes.download_url,
+        fileSizeBytes: allItems.reduce((acc, curr) => acc + curr.file_size_bytes, 0),
+        isZip: combinedRes.is_zip,
       };
       setHistory((prev) => [historyEntry, ...prev.slice(0, 9)]);
     } catch (err: any) {
@@ -295,7 +360,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* Preset / Mode Activation Banner */}
       {(presetSource || presetAction) && (
-        <div className="p-3.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/90 dark:border-blue-800/80 rounded-2xl text-blue-900 dark:text-blue-300 text-xs font-bold flex items-center justify-between shadow-2xs">
+        <div className="p-3.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/90 dark:border-blue-800/80 rounded-2xl text-blue-900 dark:text-blue-300 text-xs font-bold flex items-center justify-between shadow-2xs ring-1 ring-blue-500/10">
           <div className="flex items-center space-x-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
             <span>
@@ -345,7 +410,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* Left Column (7 Columns): Upload Stage & File Queue + Quick Actions */}
         <div className="lg:col-span-7 space-y-6">
           {/* Main Dropzone Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
+          <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
@@ -399,9 +464,11 @@ export const HomePage: React.FC<HomePageProps> = ({
                       key={item.id}
                       item={item}
                       index={idx}
-                      targetFormat={selectedTarget}
-                      availableTargets={availableTargets}
-                      onSelectTarget={(tgt) => setSelectedTarget(tgt)}
+                      targetFormat={item.customTarget || selectedTarget}
+                      availableTargets={
+                        formatsData?.formats[item.detectedExt.toLowerCase()] || availableTargets
+                      }
+                      onSelectTarget={(tgt) => handleSelectFileTarget(item.id, tgt)}
                       onRemove={handleRemoveFile}
                       onMoveUp={() => handleMoveFileUp(idx)}
                       onMoveDown={() => handleMoveFileDown(idx)}
@@ -438,19 +505,20 @@ export const HomePage: React.FC<HomePageProps> = ({
               onSelectTarget={(t) => setSelectedTarget(t)}
               options={options}
               onChangeOptions={setOptions}
-              filesCount={files.length}
-              isConverting={isConverting}
               onConvert={handleConvert}
+              isConverting={isConverting}
               canMergeIntoPdf={canMergeIntoPdf}
               isMultiPdf={isMultiPdf}
               mergePdf={mergePdf}
               onToggleMergePdf={setMergePdf}
+              filesCount={files.length}
+              disabled={files.length === 0}
             />
           )}
 
           {/* Session Activity Hub (Recent Conversions) */}
           {history.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 space-y-3 shadow-xs">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 space-y-3 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 <div className="flex items-center space-x-2">
                   <History className="w-3.5 h-3.5 text-slate-500" />
@@ -470,13 +538,16 @@ export const HomePage: React.FC<HomePageProps> = ({
                   <div key={item.id} className="py-2.5 flex items-center justify-between">
                     <div className="min-w-0 pr-3">
                       <p
-                        className="font-bold text-slate-800 dark:text-slate-200 truncate"
+                        className="font-bold font-display text-slate-800 dark:text-slate-200 truncate"
                         title={item.convertedFilename}
                       >
                         {item.convertedFilename}
                       </p>
                       <p className="text-[10px] text-slate-400">
-                        {item.timestamp} • {formatBytes(item.fileSizeBytes)}
+                        {item.timestamp} • {formatBytes(item.fileSizeBytes)} •{' '}
+                        <span className="font-bold text-blue-600 dark:text-blue-400 uppercase">
+                          {item.targetFormat}
+                        </span>
                       </p>
                     </div>
                     <div className="flex items-center space-x-1 shrink-0">
