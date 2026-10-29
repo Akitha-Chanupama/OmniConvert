@@ -149,3 +149,5 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     </div>
   );
 };
+
+export default QuickActions;
