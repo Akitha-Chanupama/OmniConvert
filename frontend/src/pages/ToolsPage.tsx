@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Search, CheckCircle, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import { ConversionApi } from '../services/conversionApi';
 import type { FormatCapability } from '../types';
 
@@ -17,12 +17,12 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onSelectTool }) => {
   }, []);
 
   const categories = [
-    { id: 'all', label: 'All Tools' },
-    { id: 'image', label: 'Images' },
+    { id: 'all', label: 'All Converters' },
+    { id: 'image', label: 'Image Studio' },
     { id: 'pdf', label: 'PDF Suite' },
     { id: 'document', label: 'Documents' },
     { id: 'spreadsheet', label: 'Spreadsheets' },
-    { id: 'data', label: 'Data & Text' },
+    { id: 'data', label: 'Structured Data' },
   ];
 
   // Flatten into tool cards
@@ -67,98 +67,139 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onSelectTool }) => {
   });
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
-      <div className="space-y-3">
-        <h1 className="text-3xl font-extrabold text-slate-900">Conversion Tools Directory</h1>
-        <p className="text-slate-500 text-sm">
-          Browse all supported file conversion tools powered by your local machine.
-        </p>
+    <div className="space-y-8 pb-16">
+      {/* Header Banner */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1.5">
+          <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Capability Matrix & Presets</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Conversion Tools Directory
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-2xl">
+            Browse all supported local converters. Selecting any tool will preload the target format in your workspace studio.
+          </p>
+        </div>
+        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/60 self-start md:self-auto">
+          {toolList.length} Total Routings Available
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
         {/* Category Pills */}
         <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setSelectedCategory(c.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                selectedCategory === c.id
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+          {categories.map((c) => {
+            const count =
+              c.id === 'all'
+                ? toolList.length
+                : toolList.filter((t) => t.category === c.id).length;
+
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setSelectedCategory(c.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${
+                  selectedCategory === c.id
+                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
+                }`}
+              >
+                <span>{c.label}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    selectedCategory === c.id
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-200/70 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Search Input */}
-        <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search tools..."
+            placeholder="Search formats (e.g. png, pdf, json)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+            className="w-full pl-10 pr-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
           />
         </div>
       </div>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-        {filteredTools.map((tool) => (
-          <div
-            key={tool.id}
-            className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between hover:border-slate-300 transition-all shadow-xs"
-          >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-1.5 font-bold uppercase text-slate-900 text-sm">
-                  <span>{tool.source}</span>
-                  <span className="text-slate-400 font-normal">→</span>
-                  <span>{tool.target}</span>
+      {filteredTools.length === 0 ? (
+        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl space-y-2">
+          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No matching conversion tools found</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Try adjusting your search keywords or filter category.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredTools.map((tool) => (
+            <div
+              key={tool.id}
+              className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 font-extrabold uppercase text-slate-900 dark:text-white text-sm">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      {tool.source}
+                    </span>
+                    <span className="text-slate-400 font-normal">→</span>
+                    <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400">
+                      {tool.target}
+                    </span>
+                  </div>
+
+                  {tool.isEnabled ? (
+                    <span className="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Ready</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>Missing CLI</span>
+                    </span>
+                  )}
                 </div>
-                {tool.isEnabled ? (
-                  <span className="inline-flex items-center space-x-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    <CheckCircle className="w-3 h-3" />
-                    <span>Ready</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center space-x-1 text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                    <AlertTriangle className="w-3 h-3" />
-                    <span>Requires {tool.requiresTool || 'dependency'}</span>
-                  </span>
+
+                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                  {tool.description || `Convert ${tool.source.toUpperCase()} files directly to ${tool.target.toUpperCase()}.`}
+                </p>
+
+                {tool.limitations && (
+                  <p className="text-[11px] text-amber-600 dark:text-amber-400/90 italic leading-snug">
+                    {tool.limitations}
+                  </p>
                 )}
               </div>
 
-              <p className="text-xs text-slate-500 line-clamp-2">
-                {tool.description || `Convert ${tool.source.toUpperCase()} files to ${tool.target.toUpperCase()}.`}
-              </p>
-
-              {tool.limitations && (
-                <p className="text-[11px] text-amber-700 italic">
-                  {tool.limitations}
-                </p>
-              )}
+              <div className="pt-5">
+                <button
+                  type="button"
+                  onClick={() => onSelectTool(tool.source, tool.target)}
+                  disabled={!tool.isEnabled}
+                  className="w-full py-2.5 px-3 text-xs font-bold bg-slate-50 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-600 rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1.5"
+                >
+                  <span>Launch Tool</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </div>
             </div>
-
-            <div className="pt-4">
-              <button
-                type="button"
-                onClick={() => onSelectTool(tool.source, tool.target)}
-                disabled={!tool.isEnabled}
-                className="w-full py-2 px-3 text-xs font-semibold bg-slate-50 hover:bg-slate-900 hover:text-white text-slate-700 border border-slate-200 hover:border-slate-900 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Use Converter
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
