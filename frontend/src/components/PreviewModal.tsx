@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { X, Download, Copy, Check, ExternalLink, Code2, Eye } from 'lucide-react';
+import { marked } from 'marked';
 import { formatBytes } from '../utils/formatters';
 import { ConversionApi } from '../services/conversionApi';
 
@@ -20,7 +21,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 }) => {
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loadingText, setLoadingText] = useState(false);
-  const [viewHtmlSource, setViewHtmlSource] = useState(false);
+  const [viewSource, setViewSource] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const fullUrl = ConversionApi.getFullDownloadUrl(downloadUrl);
@@ -29,7 +30,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'ico', 'svg'].includes(ext);
   const isPdf = ext === 'pdf';
   const isHtml = ext === 'html' || ext === 'htm';
-  const isTextLike = ['txt', 'md', 'json', 'yaml', 'yml', 'xml', 'csv', 'html', 'htm'].includes(ext);
+  const isMarkdown = ext === 'md' || ext === 'markdown';
+  const isTextLike = ['txt', 'md', 'markdown', 'json', 'yaml', 'yml', 'xml', 'csv', 'html', 'htm'].includes(ext);
+  const canToggleRender = isHtml || isMarkdown;
 
   useEffect(() => {
     if (isOpen && isTextLike && !isPdf) {
@@ -48,6 +51,62 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       setTextContent(null);
     }
   }, [isOpen, fullUrl, isTextLike, isPdf]);
+
+  // Build rendered HTML for Markdown
+  const markdownHtmlDoc = useMemo(() => {
+    if (!isMarkdown || !textContent) return '';
+    try {
+      const parsedBody = marked.parse(textContent) as string;
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.65;
+      color: #1e293b;
+      background-color: #ffffff;
+      padding: 2.25rem;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { color: #f1f5f9; background-color: #0b1329; }
+      h1, h2, h3, h4 { color: #ffffff !important; }
+      hr { border-color: #334155 !important; }
+      code { background-color: #1e293b !important; color: #38bdf8 !important; }
+      pre { background-color: #0f172a !important; border-color: #334155 !important; }
+      table th { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
+      table td { border-color: #334155 !important; }
+      blockquote { border-color: #6366f1 !important; color: #94a3b8 !important; }
+    }
+    h1 { font-size: 1.85rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-top: 0; color: #0f172a; }
+    h2 { font-size: 1.35rem; font-weight: 700; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.35rem; margin-top: 1.5rem; color: #1e293b; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.25rem; color: #334155; }
+    p { margin: 0.75rem 0; }
+    ul, ol { padding-left: 1.5rem; margin: 0.75rem 0; }
+    li { margin: 0.25rem 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.875em; background-color: #f1f5f9; padding: 0.2em 0.4em; border-radius: 4px; }
+    pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; border: 1px solid #1e293b; line-height: 1.45; }
+    pre code { background-color: transparent; color: inherit; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background-color: #f8fafc; font-weight: 600; color: #0f172a; }
+    blockquote { border-left: 4px solid #6366f1; padding-left: 1rem; margin: 1rem 0; color: #64748b; font-style: italic; }
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0; }
+    a { color: #3b82f6; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  ${parsedBody}
+</body>
+</html>`;
+    } catch {
+      return textContent;
+    }
+  }, [isMarkdown, textContent]);
 
   if (!isOpen) return null;
 
@@ -68,22 +127,29 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60">
           <div className="min-w-0 pr-4">
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate">
-              {filename}
-            </h3>
+            <div className="flex items-center space-x-2">
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate">
+                {filename}
+              </h3>
+              {isMarkdown && (
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50 shrink-0">
+                  Markdown
+                </span>
+              )}
+            </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {fileSizeBytes !== undefined && formatBytes(fileSizeBytes)} • {ext.toUpperCase()} Preview
             </p>
           </div>
 
           <div className="flex items-center space-x-2">
-            {isHtml && (
+            {canToggleRender && (
               <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-semibold mr-2">
                 <button
                   type="button"
-                  onClick={() => setViewHtmlSource(false)}
+                  onClick={() => setViewSource(false)}
                   className={`px-3 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
-                    !viewHtmlSource
+                    !viewSource
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
@@ -93,9 +159,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setViewHtmlSource(true)}
+                  onClick={() => setViewSource(true)}
                   className={`px-3 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
-                    viewHtmlSource
+                    viewSource
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
@@ -114,7 +180,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                 title="Copy content"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+                <span className="hidden sm:inline">{copied ? 'Copied' : isMarkdown ? 'Copy MD' : 'Copy'}</span>
               </button>
             )}
 
@@ -163,7 +229,14 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               title={filename}
               className="w-full h-[70vh] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white shadow-2xs"
             />
-          ) : isHtml && !viewHtmlSource ? (
+          ) : isMarkdown && !viewSource ? (
+            <iframe
+              srcDoc={markdownHtmlDoc}
+              title={filename}
+              sandbox="allow-same-origin"
+              className="w-full h-[70vh] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white shadow-2xs p-2"
+            />
+          ) : isHtml && !viewSource ? (
             <iframe
               srcDoc={textContent || ''}
               title={filename}

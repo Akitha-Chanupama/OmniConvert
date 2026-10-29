@@ -1,5 +1,5 @@
-import React from 'react';
-import { CheckCircle2, Download, RefreshCw, Archive, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, Download, RefreshCw, Archive, Eye, Copy, Check } from 'lucide-react';
 import type { BatchConversionResponse, ConvertedFileInfo } from '../types';
 import { formatBytes } from '../utils/formatters';
 import { ConversionApi } from '../services/conversionApi';
@@ -15,7 +15,26 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
   onReset,
   onPreview,
 }) => {
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const fullDownloadUrl = ConversionApi.getFullDownloadUrl(result.download_url);
+
+  const isCopyable = (filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase() || '';
+    return ['md', 'markdown', 'txt', 'json', 'yaml', 'yml', 'xml', 'csv', 'html', 'htm'].includes(ext);
+  };
+
+  const handleCopyItem = (item: ConvertedFileInfo) => {
+    const key = item.conversion_id + item.converted_filename;
+    const url = ConversionApi.getFullDownloadUrl(item.download_url);
+    fetch(url)
+      .then((res) => res.text())
+      .then((text) => {
+        navigator.clipboard.writeText(text);
+        setCopiedKey(key);
+        setTimeout(() => setCopiedKey(null), 2000);
+      })
+      .catch((err) => console.error('Failed to copy file content', err));
+  };
 
   return (
     <div className="p-6 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-sm space-y-6">
@@ -30,38 +49,65 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
       </div>
 
       <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden bg-slate-50/50 dark:bg-slate-950/40">
-        {result.items.map((item, idx) => (
-          <div key={idx} className="flex items-center justify-between p-3.5 sm:p-4 text-xs sm:text-sm">
-            <div className="min-w-0 pr-4">
-              <p className="font-semibold text-slate-800 dark:text-slate-200 truncate" title={item.converted_filename}>
-                {item.converted_filename}
-              </p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                {formatBytes(item.file_size_bytes)} • From {item.original_filename}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 shrink-0">
-              {onPreview && (
-                <button
-                  type="button"
-                  onClick={() => onPreview(item)}
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+        {result.items.map((item, idx) => {
+          const itemKey = item.conversion_id + item.converted_filename;
+          const isCopied = copiedKey === itemKey;
+          const canCopy = isCopyable(item.converted_filename);
+
+          return (
+            <div key={idx} className="flex items-center justify-between p-3.5 sm:p-4 text-xs sm:text-sm">
+              <div className="min-w-0 pr-4">
+                <p className="font-semibold text-slate-800 dark:text-slate-200 truncate" title={item.converted_filename}>
+                  {item.converted_filename}
+                </p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                  {formatBytes(item.file_size_bytes)} • From {item.original_filename}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 shrink-0">
+                {canCopy && (
+                  <button
+                    type="button"
+                    onClick={() => handleCopyItem(item)}
+                    className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+                    title="Copy text content to clipboard"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {onPreview && (
+                  <button
+                    type="button"
+                    onClick={() => onPreview(item)}
+                    className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                    <span>Preview</span>
+                  </button>
+                )}
+                <a
+                  href={ConversionApi.getFullDownloadUrl(item.download_url)}
+                  download={item.converted_filename}
+                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl inline-flex items-center space-x-1.5 transition-colors shadow-2xs"
                 >
-                  <Eye className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                  <span>Preview</span>
-                </button>
-              )}
-              <a
-                href={ConversionApi.getFullDownloadUrl(item.download_url)}
-                download={item.converted_filename}
-                className="px-3.5 py-1.5 text-xs font-bold text-white bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl inline-flex items-center space-x-1.5 transition-colors shadow-2xs"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download</span>
-              </a>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </a>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">

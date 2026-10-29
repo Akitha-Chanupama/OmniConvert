@@ -60,6 +60,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     title: 'DOCUMENT CONVERTER',
     icon: FileText,
     tools: [
+      { id: 'md-to-pdf', label: 'MD to PDF', source: 'MD', target: 'PDF' },
       { id: 'docx-to-pdf', label: 'DOCX to PDF', source: 'DOCX', target: 'PDF' },
       { id: 'pdf-to-docx', label: 'PDF to DOCX', source: 'PDF', target: 'DOCX' },
       { id: 'txt-to-pdf', label: 'TXT to PDF', source: 'TXT', target: 'PDF' },

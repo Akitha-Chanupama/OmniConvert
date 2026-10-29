@@ -128,3 +128,33 @@ def test_pdf_to_markdown(temp_dir: Path):
     assert result.stat().st_size > 0
     content = result.read_text(encoding="utf-8")
     assert "OmniConvert" in content
+
+def test_markdown_to_pdf(temp_dir: Path):
+    converter = PDFConverter()
+    md_file = temp_dir / "sample.md"
+    md_content = """# OmniConvert Local Studio
+
+OmniConvert performs 100% offline conversions.
+
+## Features
+- **Zero Cloud Leakage**: Everything runs on localhost.
+- **Fast Execution**: High-performance libraries.
+
+| Column A | Column B |
+| --- | --- |
+| Val 1 | Val 2 |
+"""
+    md_file.write_text(md_content, encoding="utf-8")
+
+    assert converter.can_convert("md", "pdf") is True
+
+    pdf_out = temp_dir / "rendered.pdf"
+    result = converter.convert(md_file, pdf_out)
+
+    assert result.exists()
+    assert result.stat().st_size > 0
+
+    reader = PdfReader(str(result))
+    assert len(reader.pages) >= 1
+    extracted = reader.pages[0].extract_text()
+    assert "OmniConvert" in extracted
