@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { UploadCloud, FileUp } from 'lucide-react';
+import { UploadCloud, FileUp, Sparkles } from 'lucide-react';
 
 interface FileDropzoneProps {
   onFilesSelected: (files: File[]) => void;
@@ -67,45 +67,58 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
       />
 
       <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
-        {/* Centered Circular Cloud Icon */}
-        <div
-          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isDragOver
-              ? 'bg-blue-600 text-white scale-110 shadow-lg shadow-blue-500/30'
-              : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white transition-transform'
-          }`}
-        >
-          {isDragOver ? (
-            <FileUp className="w-8 h-8 sm:w-10 sm:h-10 animate-bounce" />
-          ) : (
-            <UploadCloud className="w-8 h-8 sm:w-10 sm:h-10" />
-          )}
+        {/* Centered Rich Multi-Layered Icon Emblem */}
+        <div className="relative">
+          <div
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center transition-all duration-300 shadow-xl ${
+              isDragOver
+                ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white scale-110 shadow-blue-500/40 ring-8 ring-blue-500/20'
+                : 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-blue-500/25 ring-4 ring-blue-500/10 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-blue-500/40 group-hover:ring-8 group-hover:ring-blue-500/20'
+            }`}
+          >
+            {isDragOver ? (
+              <FileUp className="w-10 h-10 sm:w-11 sm:h-11 animate-bounce" />
+            ) : (
+              <UploadCloud className="w-10 h-10 sm:w-11 sm:h-11" />
+            )}
+          </div>
+          <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30">
+            <Sparkles className="w-3.5 h-3.5 fill-white" />
+          </div>
         </div>
 
         <div className="space-y-2 max-w-md">
-          <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+          <p className="font-display text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             {isDragOver ? (
               'Drop files to upload instantly'
             ) : (
               <>
                 Drag your files here, or{' '}
-                <span className="text-blue-600 dark:text-blue-400 underline underline-offset-2">
+                <span className="text-blue-600 dark:text-blue-400 underline underline-offset-4 decoration-2 decoration-blue-500/40 hover:decoration-blue-500">
                   browse files
                 </span>
               </>
             )}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Supports multiple files. Press <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-700 dark:text-slate-300">Ctrl</kbd> + <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono text-slate-700 dark:text-slate-300">V</kbd> to paste from clipboard.
+            Supports multiple files. Press{' '}
+            <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+              Ctrl
+            </kbd>{' '}
+            +{' '}
+            <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+              V
+            </kbd>{' '}
+            to paste from clipboard.
           </p>
         </div>
 
         {/* Supported Format Pills */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-          {['JPG', 'PNG', 'WEBP', 'PDF', 'DOCX', 'XLSX', 'CSV', 'JSON'].map((fmt) => (
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-2 font-display text-xs font-bold text-slate-700 dark:text-slate-300">
+          {['JPG', 'PNG', 'WEBP', 'PDF', 'DOCX', 'XLSX', 'CSV', 'JSON', 'MD'].map((fmt) => (
             <span
               key={fmt}
-              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80"
+              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs transition-transform hover:scale-105"
             >
               {fmt}
             </span>
