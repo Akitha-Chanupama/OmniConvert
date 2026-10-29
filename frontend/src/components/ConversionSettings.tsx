@@ -3,7 +3,6 @@ import {
   Settings,
   ArrowRight,
   Loader2,
-  Sparkles,
 } from 'lucide-react';
 import type { ConversionOptions } from '../types';
 
@@ -319,7 +318,6 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
             </>
           ) : (
             <>
-              <Sparkles className="w-4.5 h-4.5 text-blue-200" />
               <span>
                 Convert {filesCount > 0 ? `${filesCount} File${filesCount > 1 ? 's' : ''}` : ''} Now
               </span>

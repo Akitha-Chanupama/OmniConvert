@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, CheckCircle, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, CheckCircle, AlertTriangle, ArrowRight, Layers } from 'lucide-react';
 import { ConversionApi } from '../services/conversionApi';
 import type { FormatCapability } from '../types';
 
@@ -72,7 +72,7 @@ export const ToolsPage: React.FC<ToolsPageProps> = ({ onSelectTool }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Layers className="w-3.5 h-3.5" />
             <span>Capability Matrix & Presets</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">

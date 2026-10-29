@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { UploadCloud, Sparkles, FileText, Image as ImageIcon, Layers, FileSpreadsheet, FileCode } from 'lucide-react';
+import { UploadCloud, FileText, Image as ImageIcon, Layers, FileSpreadsheet, FileCode } from 'lucide-react';
 
 interface GlobalDropOverlayProps {
   onFilesDropped: (files: File[]) => void;
@@ -83,9 +83,6 @@ export const GlobalDropOverlay: React.FC<GlobalDropOverlayProps> = ({
         <div className="relative mb-6">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-2xl shadow-blue-500/50 ring-8 ring-blue-500/20 transform hover:scale-105 transition-transform duration-300">
             <UploadCloud className="w-12 h-12 sm:w-14 sm:h-14 animate-bounce" />
-          </div>
-          <div className="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/40">
-            <Sparkles className="w-5 h-5 fill-white" />
           </div>
         </div>
 

@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   Settings,
   Trash2,
-  Sparkles,
+  LayoutDashboard,
   CornerDownLeft,
   X,
 } from 'lucide-react';
@@ -92,7 +92,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       title: 'Go to Dashboard',
       subtitle: 'Main conversion workspace',
       category: 'Actions',
-      icon: Sparkles,
+      icon: LayoutDashboard,
       accentColor: 'text-blue-500',
       shortcut: 'D',
       onSelect: () => {

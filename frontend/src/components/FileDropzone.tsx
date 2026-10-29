@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { UploadCloud, FileUp, Sparkles } from 'lucide-react';
+import { UploadCloud, FileUp } from 'lucide-react';
 
 interface FileDropzoneProps {
   onFilesSelected: (files: File[]) => void;
@@ -81,9 +81,6 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
             ) : (
               <UploadCloud className="w-10 h-10 sm:w-11 sm:h-11" />
             )}
-          </div>
-          <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30">
-            <Sparkles className="w-3.5 h-3.5 fill-white" />
           </div>
         </div>
 

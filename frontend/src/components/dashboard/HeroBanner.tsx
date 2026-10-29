@@ -1,13 +1,12 @@
 import React from 'react';
-import { Shield, Zap, Lock, Sparkles } from 'lucide-react';
+import { Shield, Zap, Lock } from 'lucide-react';
 
 export const HeroBanner: React.FC = () => {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
       {/* Title & Subtitle */}
       <div className="space-y-2.5 max-w-2xl">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 shadow-2xs">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+        <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 shadow-2xs">
           <span className="font-display text-xs font-black tracking-wider uppercase text-blue-600 dark:text-blue-400">
             PRIVATE LOCAL STUDIO • ZERO CLOUD UPLOADS
           </span>
