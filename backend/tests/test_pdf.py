@@ -72,3 +72,41 @@ def test_invalid_pdf_raises_error(temp_dir: Path):
     out_txt = temp_dir / "out.txt"
     with pytest.raises(Exception):
         converter.convert(bad_pdf, out_txt)
+
+def test_pdf_split(temp_dir: Path):
+    converter = PDFConverter()
+    # Create a 2-page PDF
+    t1 = temp_dir / "p1.txt"
+    t1.write_text("Page 1 content")
+    p1 = temp_dir / "p1.pdf"
+    converter.convert(t1, p1)
+
+    t2 = temp_dir / "p2.txt"
+    t2.write_text("Page 2 content")
+    p2 = temp_dir / "p2.pdf"
+    converter.convert(t2, p2)
+
+    merged = temp_dir / "twopage.pdf"
+    converter.merge_pdfs([p1, p2], merged)
+
+    split_dir = temp_dir / "split_output"
+    split_files = converter.split_pdf(merged, split_dir)
+
+    assert len(split_files) == 2
+    assert all(f.exists() for f in split_files)
+    assert split_files[0].name == "twopage_page_1.pdf"
+    assert split_files[1].name == "twopage_page_2.pdf"
+
+def test_pdf_to_images(temp_dir: Path):
+    converter = PDFConverter()
+    t = temp_dir / "render.txt"
+    t.write_text("Rendering page test")
+    p = temp_dir / "render.pdf"
+    converter.convert(t, p)
+
+    img_dir = temp_dir / "rendered_images"
+    images = converter.convert_pdf_to_images(p, img_dir, target_format="png")
+
+    assert len(images) == 1
+    assert images[0].exists()
+    assert images[0].name == "render_page_1.png"

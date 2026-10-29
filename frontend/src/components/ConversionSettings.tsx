@@ -143,7 +143,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       </div>
 
       {/* Multi-PDF Merge or Multi-Image to Single PDF */}
-      {canMergeIntoPdf && onToggleMergePdf && (
+      {canMergeIntoPdf && onToggleMergePdf && !options.split_pdf && (
         <div className="flex items-center space-x-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
           <input
             type="checkbox"
@@ -157,6 +157,23 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
             {isMultiPdf
               ? 'Merge all uploaded PDFs into a single document in order'
               : 'Combine all uploaded images into a single multi-page PDF document in order'}
+          </label>
+        </div>
+      )}
+
+      {/* Split PDF into individual single-page files */}
+      {isPdfTarget && !canMergeIntoPdf && (
+        <div className="flex items-center space-x-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+          <input
+            type="checkbox"
+            id="split_pdf_box"
+            checked={options.split_pdf ?? false}
+            onChange={(e) => updateOption('split_pdf', e.target.checked)}
+            disabled={disabled}
+            className="rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4"
+          />
+          <label htmlFor="split_pdf_box" className="text-slate-800 dark:text-slate-200 font-semibold text-xs cursor-pointer select-none">
+            Split PDF into individual single-page files (ZIP)
           </label>
         </div>
       )}

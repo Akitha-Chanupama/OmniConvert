@@ -9,6 +9,8 @@ import { ShieldCheck } from 'lucide-react';
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'convert' | 'tools' | 'settings'>('convert');
   const [presetTarget, setPresetTarget] = useState<string | null>(null);
+  const [presetSource, setPresetSource] = useState<string | null>(null);
+  const [presetAction, setPresetAction] = useState<'convert' | 'merge_pdf' | 'split_pdf' | null>(null);
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -31,18 +33,23 @@ export const App: React.FC = () => {
   };
 
   const handleSelectToolPreset = (
-    _source: string,
+    source: string,
     target: string,
-    _action?: 'convert' | 'merge_pdf' | 'split_pdf'
+    action?: 'convert' | 'merge_pdf' | 'split_pdf'
   ) => {
     setPresetTarget(target);
-    setSelectedPresetId(`${_source.toLowerCase()}-to-${target.toLowerCase()}`);
+    setPresetSource(source);
+    setPresetAction(action || null);
+    setSelectedPresetId(`${source.toLowerCase()}-to-${target.toLowerCase()}${action ? '-' + action : ''}`);
     setActiveTab('convert');
   };
 
   const handleSelectDashboard = () => {
     setActiveTab('convert');
     setSelectedPresetId(null);
+    setPresetTarget(null);
+    setPresetSource(null);
+    setPresetAction(null);
   };
 
   const handleSelectSettings = () => {
@@ -50,8 +57,9 @@ export const App: React.FC = () => {
     setSelectedPresetId(null);
   };
 
-  const handleSelectToolFromCatalog = (_source: string, target: string) => {
+  const handleSelectToolFromCatalog = (source: string, target: string) => {
     setPresetTarget(target);
+    setPresetSource(source);
     setActiveTab('convert');
   };
 
@@ -88,7 +96,13 @@ export const App: React.FC = () => {
             <HomePage
               onNavigateToTools={() => setActiveTab('tools')}
               presetTarget={presetTarget}
-              onClearPreset={() => setPresetTarget(null)}
+              presetSource={presetSource}
+              presetAction={presetAction}
+              onClearPreset={() => {
+                setPresetTarget(null);
+                setPresetSource(null);
+                setPresetAction(null);
+              }}
             />
           )}
 

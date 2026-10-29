@@ -29,12 +29,16 @@ import { getFileExtension, formatBytes } from '../utils/formatters';
 interface HomePageProps {
   onNavigateToTools?: () => void;
   presetTarget?: string | null;
+  presetSource?: string | null;
+  presetAction?: 'convert' | 'merge_pdf' | 'split_pdf' | null;
   onClearPreset?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   onNavigateToTools,
   presetTarget,
+  presetSource,
+  presetAction,
   onClearPreset,
 }) => {
   const [formatsData, setFormatsData] = useState<FormatsResponse | null>(null);
@@ -85,9 +89,17 @@ export const HomePage: React.FC<HomePageProps> = ({
   useEffect(() => {
     if (presetTarget) {
       setSelectedTarget(presetTarget.toUpperCase());
-      if (onClearPreset) onClearPreset();
     }
-  }, [presetTarget, onClearPreset]);
+    if (presetAction === 'merge_pdf') {
+      setSelectedTarget('PDF');
+      setMergePdf(true);
+      setOptions((prev) => ({ ...prev, split_pdf: false }));
+    } else if (presetAction === 'split_pdf') {
+      setSelectedTarget('PDF');
+      setMergePdf(false);
+      setOptions((prev) => ({ ...prev, split_pdf: true }));
+    }
+  }, [presetTarget, presetSource, presetAction]);
 
   // Handle file addition
   const handleFilesSelected = (newFiles: File[]) => {
@@ -280,6 +292,31 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-6 sm:space-y-8 pb-16">
       {/* Hero Banner Section */}
       <HeroBanner />
+
+      {/* Preset / Mode Activation Banner */}
+      {(presetSource || presetAction) && (
+        <div className="p-3.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/90 dark:border-blue-800/80 rounded-2xl text-blue-900 dark:text-blue-300 text-xs font-bold flex items-center justify-between shadow-2xs">
+          <div className="flex items-center space-x-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+            <span>
+              {presetAction === 'split_pdf'
+                ? 'Mode Active: Split PDF — drop a multi-page PDF to extract individual pages.'
+                : presetAction === 'merge_pdf'
+                ? 'Mode Active: Merge PDF — drop multiple PDFs or images to compile into one document.'
+                : `Preset Active: ${presetSource?.toUpperCase()} → ${presetTarget?.toUpperCase()} conversion.`}
+            </span>
+          </div>
+          {onClearPreset && (
+            <button
+              type="button"
+              onClick={onClearPreset}
+              className="px-2 py-1 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 hover:bg-blue-100 rounded-lg text-[11px] font-bold border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
+            >
+              Reset Filter
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Paste notification pill */}
       {pasteNotice && (

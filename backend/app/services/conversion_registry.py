@@ -2,8 +2,8 @@ from typing import Dict, List, Optional
 from app.config import config
 from app.converters.base import BaseConverter
 from app.converters.documents import DocumentConverter
-from app.converters.images import ImageConverter
-from app.converters.pdf import PDFConverter
+from app.converters.images import ImageConverter, HAS_HEIF
+from app.converters.pdf import PDFConverter, HAS_PDFIUM
 from app.converters.spreadsheets import SpreadsheetConverter
 from app.converters.text import TextDataConverter
 from app.schemas.conversion import FormatCapability, FormatsResponse
@@ -79,6 +79,20 @@ class ConversionRegistry:
                 is_enabled=True,
                 description="Windows Icon file",
             ),
+            FormatCapability(
+                source_format="heic",
+                category="image",
+                supported_targets=["jpg", "png", "webp", "pdf"],
+                is_enabled=HAS_HEIF,
+                description="Apple HEIC Photo to JPEG/PNG",
+            ),
+            FormatCapability(
+                source_format="heif",
+                category="image",
+                supported_targets=["jpg", "png", "webp", "pdf"],
+                is_enabled=HAS_HEIF,
+                description="High Efficiency Image Format",
+            ),
             # Text & Structured Data
             FormatCapability(
                 source_format="txt",
@@ -148,9 +162,9 @@ class ConversionRegistry:
             FormatCapability(
                 source_format="pdf",
                 category="pdf",
-                supported_targets=["txt", "pdf"],
+                supported_targets=["txt", "pdf"] + (["jpg", "png", "webp"] if HAS_PDFIUM else []),
                 is_enabled=True,
-                description="PDF Document (text extraction, page range, rotate, merge)",
+                description="PDF Document (text extraction, page rendering, split, rotate, merge)",
             ),
             # Office Documents
             FormatCapability(

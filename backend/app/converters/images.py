@@ -4,8 +4,17 @@ from PIL import Image
 from app.converters.base import BaseConverter
 from app.schemas.conversion import ConversionOptions
 
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+    HAS_HEIF = True
+except Exception:
+    HAS_HEIF = False
+
 class ImageConverter(BaseConverter):
-    SUPPORTED_INPUTS: Set[str] = {"jpg", "jpeg", "png", "webp", "bmp", "tiff", "tif", "gif", "ico"}
+    SUPPORTED_INPUTS: Set[str] = {
+        "jpg", "jpeg", "png", "webp", "bmp", "tiff", "tif", "gif", "ico", "heic", "heif"
+    }
     SUPPORTED_OUTPUTS: Set[str] = {"jpg", "jpeg", "png", "webp", "bmp", "tiff", "gif", "ico", "pdf"}
 
     def can_convert(self, source_ext: str, target_ext: str) -> bool:
@@ -15,6 +24,8 @@ class ImageConverter(BaseConverter):
             s = "jpg"
         if t == "jpeg":
             t = "jpg"
+        if s in {"heic", "heif"} and not HAS_HEIF:
+            return False
         if s == t:
             return True
         return s in self.SUPPORTED_INPUTS and t in self.SUPPORTED_OUTPUTS
