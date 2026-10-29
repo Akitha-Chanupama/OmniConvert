@@ -110,3 +110,21 @@ def test_pdf_to_images(temp_dir: Path):
     assert len(images) == 1
     assert images[0].exists()
     assert images[0].name == "render_page_1.png"
+
+def test_pdf_to_markdown(temp_dir: Path):
+    converter = PDFConverter()
+    t = temp_dir / "doc_for_md.txt"
+    t.write_text("Introduction to OmniConvert\n\nThis is paragraph one.\n\nKey features:\n- Privacy first\n- Fast conversion", encoding="utf-8")
+    p = temp_dir / "doc_for_md.pdf"
+    converter.convert(t, p)
+
+    assert p.exists()
+    assert converter.can_convert("pdf", "md") is True
+
+    md_out = temp_dir / "converted.md"
+    result = converter.convert(p, md_out)
+
+    assert result.exists()
+    assert result.stat().st_size > 0
+    content = result.read_text(encoding="utf-8")
+    assert "OmniConvert" in content

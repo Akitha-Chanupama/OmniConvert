@@ -48,6 +48,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     title: 'PDF TOOLS',
     icon: Layers,
     tools: [
+      { id: 'pdf-to-md', label: 'PDF to Markdown', source: 'PDF', target: 'MD' },
       { id: 'pdf-to-jpg', label: 'PDF to JPG', source: 'PDF', target: 'JPG' },
       { id: 'jpg-to-pdf', label: 'JPG to PDF', source: 'JPG', target: 'PDF' },
       { id: 'merge-pdf', label: 'Merge PDF', source: 'PDF', target: 'PDF', action: 'merge_pdf' as const },

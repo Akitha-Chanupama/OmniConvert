@@ -21,7 +21,7 @@ except Exception:
 
 class PDFConverter(BaseConverter):
     SUPPORTED_INPUTS: Set[str] = {"pdf", "txt"}
-    SUPPORTED_OUTPUTS: Set[str] = {"pdf", "txt", "jpg", "jpeg", "png", "webp"}
+    SUPPORTED_OUTPUTS: Set[str] = {"pdf", "txt", "jpg", "jpeg", "png", "webp", "md"}
 
     def can_convert(self, source_ext: str, target_ext: str) -> bool:
         s = source_ext.lower().lstrip(".")
@@ -32,6 +32,7 @@ class PDFConverter(BaseConverter):
             return HAS_PDFIUM
         valid_pairs = {
             ("pdf", "txt"),
+            ("pdf", "md"),
             ("txt", "pdf"),
             ("pdf", "pdf"),  # for rotate, split, merge, page range
         }
@@ -142,6 +143,44 @@ class PDFConverter(BaseConverter):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(full_text)
+        return output_path
+
+    def convert_pdf_to_md(
+        self,
+        input_path: Path,
+        output_path: Path,
+        options: Optional[ConversionOptions] = None,
+    ) -> Path:
+        """Extracts structured Markdown from PDF using pymupdf4llm, falling back to pypdf."""
+        md_text = ""
+        # 1. Attempt high-fidelity PyMuPDF4LLM extraction
+        try:
+            import pymupdf4llm
+            md_text = pymupdf4llm.to_markdown(str(input_path))
+        except Exception:
+            md_text = ""
+
+        # 2. Fallback to pypdf extraction if pymupdf4llm returned nothing or failed
+        if not md_text or not md_text.strip():
+            reader = PdfReader(str(input_path))
+            total_pages = len(reader.pages)
+            selected_indices = list(range(total_pages))
+            if options and options.page_range:
+                selected_indices = self.parse_page_range(options.page_range, total_pages)
+
+            lines: List[str] = []
+            for idx in selected_indices:
+                page_text = reader.pages[idx].extract_text() or ""
+                lines.append(f"## Page {idx + 1}\n\n{page_text.strip()}\n")
+            md_text = "\n\n".join(lines).strip()
+
+        if not md_text:
+            md_text = f"# {input_path.stem}\n\n*(No text content could be extracted from this PDF)*\n"
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(md_text)
+
         return output_path
 
     def parse_page_range(self, range_str: str, total_pages: int) -> List[int]:
@@ -297,6 +336,8 @@ class PDFConverter(BaseConverter):
             self.convert_txt_to_pdf(input_path, output_path)
         elif s == "pdf" and t == "txt":
             self.convert_pdf_to_txt(input_path, output_path)
+        elif s == "pdf" and t == "md":
+            self.convert_pdf_to_md(input_path, output_path, options)
         elif s == "pdf" and t == "pdf":
             self.rotate_or_extract_pdf(input_path, output_path, options)
         elif s == "pdf" and t in {"jpg", "png", "webp"}:
