@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional
 from fastapi import UploadFile
 from app.converters.archives import ArchiveService
+from app.converters.images import ImageConverter
 from app.converters.pdf import PDFConverter
 from app.schemas.conversion import BatchConversionResponse, ConversionOptions, ConvertedFileInfo
 from app.services.cleanup_service import cleanup_service
@@ -53,8 +54,8 @@ class ConversionService:
                 saved_input_paths.append(target_input_path)
                 original_filenames.append(sanitized_name)
 
-            # Special case: PDF Merge
-            if merge_pdf or (len(files) > 1 and target_ext == "pdf" and all(p.suffix.lower() == ".pdf" for p in saved_input_paths)):
+            # Special case 1: PDF Merge
+            if merge_pdf and (len(files) > 1 and target_ext == "pdf" and all(p.suffix.lower() == ".pdf" for p in saved_input_paths)):
                 merged_output_path = output_dir / "merged.pdf"
                 pdf_conv = PDFConverter()
                 pdf_conv.merge_pdfs(saved_input_paths, merged_output_path)
@@ -76,6 +77,31 @@ class ConversionService:
                     download_url=file_info.download_url,
                     items=[file_info],
                 )
+
+            # Special case 2: Multi-Image to Single PDF
+            is_all_images = all(p.suffix.lower().lstrip(".") in {"jpg", "jpeg", "png", "webp", "bmp", "tiff"} for p in saved_input_paths)
+            if merge_pdf and len(files) > 1 and target_ext == "pdf" and is_all_images:
+                compiled_output_path = output_dir / "compiled_images.pdf"
+                ImageConverter.convert_multiple_to_pdf(saved_input_paths, compiled_output_path)
+
+                file_info = ConvertedFileInfo(
+                    conversion_id=cid,
+                    original_filename=", ".join(original_filenames),
+                    converted_filename=compiled_output_path.name,
+                    target_format="pdf",
+                    file_size_bytes=compiled_output_path.stat().st_size,
+                    download_url=f"/api/v1/convert/{cid}/download?filename={compiled_output_path.name}",
+                )
+
+                return BatchConversionResponse(
+                    success=True,
+                    message=f"Compiled {len(saved_input_paths)} images into a single PDF document.",
+                    conversion_id=cid,
+                    is_zip=False,
+                    download_url=file_info.download_url,
+                    items=[file_info],
+                )
+
 
             # 2. Standard Conversion
             converted_items: List[ConvertedFileInfo] = []

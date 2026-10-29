@@ -61,3 +61,20 @@ def test_invalid_image_raises_error(temp_dir: Path):
     output_path = temp_dir / "corrupted_out.jpg"
     with pytest.raises(Exception):
         converter.convert(input_path, output_path)
+
+def test_multiple_images_to_pdf(temp_dir: Path):
+    img1_path = temp_dir / "img1.png"
+    img2_path = temp_dir / "img2.jpg"
+    Image.new("RGB", (100, 100), (255, 0, 0)).save(img1_path)
+    Image.new("RGB", (120, 120), (0, 255, 0)).save(img2_path)
+
+    pdf_out = temp_dir / "combined.pdf"
+    ImageConverter.convert_multiple_to_pdf([img1_path, img2_path], pdf_out)
+
+    assert pdf_out.exists()
+    assert pdf_out.stat().st_size > 0
+
+    from pypdf import PdfReader
+    reader = PdfReader(str(pdf_out))
+    assert len(reader.pages) == 2
+

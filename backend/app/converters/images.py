@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Set
+from typing import List, Optional, Set
 from PIL import Image
 from app.converters.base import BaseConverter
 from app.schemas.conversion import ConversionOptions
@@ -118,3 +118,48 @@ class ImageConverter(BaseConverter):
             raise RuntimeError(f"Image conversion to {target_ext} failed: generated output is missing or empty.")
 
         return output_path
+
+    @staticmethod
+    def convert_multiple_to_pdf(image_paths: List[Path], output_path: Path) -> Path:
+        """Combines multiple image files in order into a single multi-page PDF document."""
+        images: List[Image.Image] = []
+        try:
+            for p in image_paths:
+                with Image.open(p) as img:
+                    if getattr(img, "is_animated", False):
+                        img.seek(0)
+                    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+                        rgba_img = img.convert("RGBA")
+                        bg = Image.new("RGBA", rgba_img.size, (255, 255, 255, 255))
+                        alpha_composite = Image.alpha_composite(bg, rgba_img)
+                        rgb_img = alpha_composite.convert("RGB")
+                    elif img.mode != "RGB":
+                        rgb_img = img.convert("RGB")
+                    else:
+                        rgb_img = img.copy()
+                    images.append(rgb_img)
+
+            if not images:
+                raise ValueError("No valid images provided to compile to PDF.")
+
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            first_img = images[0]
+            first_img.save(
+                output_path,
+                "PDF",
+                resolution=100.0,
+                save_all=True,
+                append_images=images[1:],
+            )
+        finally:
+            for img in images:
+                try:
+                    img.close()
+                except Exception:
+                    pass
+
+        if not output_path.exists() or output_path.stat().st_size == 0:
+            raise RuntimeError("Multi-image to PDF compilation failed: output is missing or empty.")
+
+        return output_path
+

@@ -1,15 +1,20 @@
 import React from 'react';
-import { CheckCircle2, Download, RefreshCw, Archive } from 'lucide-react';
-import type { BatchConversionResponse } from '../types';
+import { CheckCircle2, Download, RefreshCw, Archive, Eye } from 'lucide-react';
+import type { BatchConversionResponse, ConvertedFileInfo } from '../types';
 import { formatBytes } from '../utils/formatters';
 import { ConversionApi } from '../services/conversionApi';
 
 interface ConversionResultProps {
   result: BatchConversionResponse;
   onReset: () => void;
+  onPreview?: (item: ConvertedFileInfo) => void;
 }
 
-export const ConversionResult: React.FC<ConversionResultProps> = ({ result, onReset }) => {
+export const ConversionResult: React.FC<ConversionResultProps> = ({
+  result,
+  onReset,
+  onPreview,
+}) => {
   const fullDownloadUrl = ConversionApi.getFullDownloadUrl(result.download_url);
 
   return (
@@ -35,14 +40,26 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({ result, onRe
                 {formatBytes(item.file_size_bytes)} • Converted from {item.original_filename}
               </p>
             </div>
-            <a
-              href={ConversionApi.getFullDownloadUrl(item.download_url)}
-              download={item.converted_filename}
-              className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg inline-flex items-center space-x-1.5 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download</span>
-            </a>
+            <div className="flex items-center space-x-2 shrink-0">
+              {onPreview && (
+                <button
+                  type="button"
+                  onClick={() => onPreview(item)}
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Preview</span>
+                </button>
+              )}
+              <a
+                href={ConversionApi.getFullDownloadUrl(item.download_url)}
+                download={item.converted_filename}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg inline-flex items-center space-x-1.5 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download</span>
+              </a>
+            </div>
           </div>
         ))}
       </div>

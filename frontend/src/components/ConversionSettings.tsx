@@ -6,6 +6,7 @@ interface ConversionSettingsProps {
   sourceFormat: string;
   targetFormat: string;
   isMultiPdf: boolean;
+  isMultiImage?: boolean;
   mergePdf: boolean;
   onToggleMergePdf: (merge: boolean) => void;
   options: ConversionOptions;
@@ -17,6 +18,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
   sourceFormat,
   targetFormat,
   isMultiPdf,
+  isMultiImage = false,
   mergePdf,
   onToggleMergePdf,
   options,
@@ -27,9 +29,10 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
   const isImageTarget = ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tiff'].includes(targetFormat.toLowerCase());
   const isPdfInput = sourceFormat.toLowerCase() === 'pdf';
   const isSpreadsheetInput = ['xlsx', 'xls'].includes(sourceFormat.toLowerCase());
+  const canMergeIntoPdf = (isMultiPdf || isMultiImage) && targetFormat.toLowerCase() === 'pdf';
 
   const hasRelevantSettings =
-    isLossyImage || isImageTarget || isPdfInput || isSpreadsheetInput || isMultiPdf;
+    isLossyImage || isImageTarget || isPdfInput || isSpreadsheetInput || canMergeIntoPdf;
 
   if (!hasRelevantSettings) {
     return null;
@@ -50,19 +53,21 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-        {/* Multi-PDF Merge Checkbox */}
-        {isMultiPdf && (
-          <div className="sm:col-span-2 flex items-center space-x-3 bg-white p-3 rounded-lg border border-slate-200">
+        {/* Multi-PDF Merge or Multi-Image to Single PDF Checkbox */}
+        {canMergeIntoPdf && (
+          <div className="sm:col-span-2 flex items-center space-x-3 bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
             <input
               type="checkbox"
               id="merge_pdf_check"
               checked={mergePdf}
               onChange={(e) => onToggleMergePdf(e.target.checked)}
               disabled={disabled}
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-4 h-4"
             />
-            <label htmlFor="merge_pdf_check" className="text-slate-800 font-medium text-sm cursor-pointer">
-              Merge all uploaded PDFs into a single document in order
+            <label htmlFor="merge_pdf_check" className="text-slate-800 font-medium text-sm cursor-pointer select-none">
+              {isMultiPdf
+                ? 'Merge all uploaded PDFs into a single document in order'
+                : 'Combine all uploaded images into a single multi-page PDF document in order'}
             </label>
           </div>
         )}
