@@ -69,12 +69,12 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
             <Settings className="w-4 h-4" />
           </div>
-          <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+          <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white">
             Conversion Settings
           </h3>
         </div>
 
-        <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-2.5 py-1 rounded-full">
+        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-3 py-1.5 rounded-full">
           {filesCount > 0 ? 'Ready to Configure' : 'Waiting for files'}
         </span>
       </div>
@@ -82,10 +82,10 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       {/* Output Format 8-Grid */}
       <div className="space-y-2.5">
         <div>
-          <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+          <label className="text-sm font-bold text-slate-900 dark:text-white block">
             Output Format
           </label>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="text-xs text-slate-400 dark:text-slate-500">
             Choose the format you want to convert to
           </span>
         </div>
@@ -103,7 +103,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
                 type="button"
                 onClick={() => isSupported && onSelectTarget(fmt)}
                 disabled={disabled || !isSupported}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold uppercase transition-all cursor-pointer ${
+                className={`py-3 px-3 rounded-xl text-sm font-bold uppercase transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-600 scale-[1.02]'
                     : isSupported
@@ -186,7 +186,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
               <label htmlFor="quality-slider" className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
                 Image Compression
               </label>
-              <span className="text-[11px] text-slate-400 dark:text-slate-500">
+              <span className="text-xs text-slate-400 dark:text-slate-500">
                 Adjust the quality of the output file
               </span>
             </div>
@@ -218,10 +218,10 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
       {isImageTarget && (
         <div className="space-y-2 pt-1">
           <div>
-            <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+            <label className="text-sm font-bold text-slate-900 dark:text-white block">
               Resize Dimensions (Optional)
             </label>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500">
+            <span className="text-xs text-slate-400 dark:text-slate-500">
               Set custom width and height (leave empty to keep original)
             </span>
           </div>
@@ -309,7 +309,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           type="button"
           onClick={onConvert}
           disabled={disabled || filesCount === 0 || !selectedTarget || isConverting}
-          className="w-full py-3.5 px-6 font-bold rounded-2xl flex items-center justify-center space-x-2 text-sm sm:text-base transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed select-none bg-[#0c1427] dark:bg-blue-600 hover:bg-[#152140] dark:hover:bg-blue-500 text-white shadow-blue-600/20"
+          className="w-full py-4 px-6 font-bold rounded-2xl flex items-center justify-center space-x-2 text-base transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed select-none bg-[#0c1427] dark:bg-blue-600 hover:bg-[#152140] dark:hover:bg-blue-500 text-white shadow-blue-600/20"
         >
           {isConverting ? (
             <>
