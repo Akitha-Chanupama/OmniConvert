@@ -123,7 +123,9 @@ export const SettingsPage: React.FC = () => {
             <div className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
               {[
                 { name: 'Pillow (PIL)', key: 'pillow', desc: 'Core image conversion and manipulation' },
+                { name: 'pillow-heif', key: 'pillow_heif', desc: 'Apple HEIC & HEIF image codec support' },
                 { name: 'pypdf', key: 'pypdf', desc: 'PDF text extraction, merging, and rotation' },
+                { name: 'pypdfium2', key: 'pypdfium2', desc: 'High-speed PDFium engine for PDF-to-image rendering' },
                 { name: 'openpyxl', key: 'openpyxl', desc: 'Excel spreadsheet (XLSX) reading and writing' },
                 { name: 'PyYAML', key: 'pyyaml', desc: 'Safe YAML structured data serialization' },
                 { name: 'defusedxml', key: 'defusedxml', desc: 'Secure XML parsing without entity injection' },

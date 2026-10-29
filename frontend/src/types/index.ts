@@ -42,6 +42,7 @@ export interface ConversionOptions {
   page_range?: string;
   rotate_degrees?: number;
   indent?: number;
+  split_pdf?: boolean;
 }
 
 export interface ConvertedFileInfo {

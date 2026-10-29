@@ -13,13 +13,23 @@ from pypdf.generic import (
 from app.converters.base import BaseConverter
 from app.schemas.conversion import ConversionOptions
 
+try:
+    import pypdfium2 as pdfium
+    HAS_PDFIUM = True
+except Exception:
+    HAS_PDFIUM = False
+
 class PDFConverter(BaseConverter):
     SUPPORTED_INPUTS: Set[str] = {"pdf", "txt"}
-    SUPPORTED_OUTPUTS: Set[str] = {"pdf", "txt"}
+    SUPPORTED_OUTPUTS: Set[str] = {"pdf", "txt", "jpg", "jpeg", "png", "webp"}
 
     def can_convert(self, source_ext: str, target_ext: str) -> bool:
         s = source_ext.lower().lstrip(".")
         t = target_ext.lower().lstrip(".")
+        if t == "jpeg":
+            t = "jpg"
+        if s == "pdf" and t in {"jpg", "png", "webp"}:
+            return HAS_PDFIUM
         valid_pairs = {
             ("pdf", "txt"),
             ("txt", "pdf"),
@@ -199,6 +209,79 @@ class PDFConverter(BaseConverter):
             writer.write(f_out)
         return output_path
 
+    def split_pdf(
+        self,
+        input_path: Path,
+        output_dir: Path,
+        options: Optional[ConversionOptions] = None,
+    ) -> List[Path]:
+        """Splits every page of a PDF into individual PDF files."""
+        reader = PdfReader(str(input_path))
+        total_pages = len(reader.pages)
+        selected_indices = list(range(total_pages))
+        if options and options.page_range:
+            selected_indices = self.parse_page_range(options.page_range, total_pages)
+
+        out_paths: List[Path] = []
+        base_stem = input_path.stem
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        for idx in selected_indices:
+            writer = PdfWriter()
+            page = reader.pages[idx]
+            if options and options.rotate_degrees:
+                page.rotate(options.rotate_degrees)
+            writer.add_page(page)
+
+            out_file = output_dir / f"{base_stem}_page_{idx + 1}.pdf"
+            with open(out_file, "wb") as f_out:
+                writer.write(f_out)
+            out_paths.append(out_file)
+
+        return out_paths
+
+    def convert_pdf_to_images(
+        self,
+        input_path: Path,
+        output_dir: Path,
+        target_format: str = "jpg",
+        options: Optional[ConversionOptions] = None,
+    ) -> List[Path]:
+        """Renders pages of a PDF to high-resolution PIL images."""
+        if not HAS_PDFIUM:
+            raise RuntimeError("pypdfium2 is required for rendering PDF pages to images.")
+
+        pdf = pdfium.PdfDocument(str(input_path))
+        total_pages = len(pdf)
+        selected_indices = list(range(total_pages))
+        if options and options.page_range:
+            selected_indices = self.parse_page_range(options.page_range, total_pages)
+
+        out_paths: List[Path] = []
+        base_stem = input_path.stem
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        target_ext = target_format.lower().lstrip(".")
+        if target_ext == "jpeg":
+            target_ext = "jpg"
+
+        for idx in selected_indices:
+            page = pdf[idx]
+            # Render at scale 2 (144 dpi) for crisp readable images
+            pil_image = page.render(scale=2).to_pil()
+            out_file = output_dir / f"{base_stem}_page_{idx + 1}.{target_ext}"
+            if target_ext in ("jpg", "jpeg") and pil_image.mode in ("RGBA", "P"):
+                pil_image = pil_image.convert("RGB")
+
+            save_kwargs = {}
+            if target_ext in ("jpg", "jpeg", "webp") and options and options.quality:
+                save_kwargs["quality"] = options.quality
+
+            pil_image.save(out_file, **save_kwargs)
+            out_paths.append(out_file)
+
+        return out_paths
+
     def convert(
         self,
         input_path: Path,
@@ -207,6 +290,8 @@ class PDFConverter(BaseConverter):
     ) -> Path:
         s = input_path.suffix.lower().lstrip(".")
         t = output_path.suffix.lower().lstrip(".")
+        if t == "jpeg":
+            t = "jpg"
 
         if s == "txt" and t == "pdf":
             self.convert_txt_to_pdf(input_path, output_path)
@@ -214,6 +299,13 @@ class PDFConverter(BaseConverter):
             self.convert_pdf_to_txt(input_path, output_path)
         elif s == "pdf" and t == "pdf":
             self.rotate_or_extract_pdf(input_path, output_path, options)
+        elif s == "pdf" and t in {"jpg", "png", "webp"}:
+            images = self.convert_pdf_to_images(input_path, output_path.parent, t, options)
+            if images:
+                if images[0] != output_path and images[0].exists():
+                    images[0].replace(output_path)
+            else:
+                raise RuntimeError("No pages extracted from PDF.")
         else:
             raise ValueError(f"Unsupported PDF conversion route: {s} -> {t}")
 

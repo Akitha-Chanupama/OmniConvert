@@ -30,6 +30,7 @@ class ConversionOptions(BaseModel):
     page_range: Optional[str] = Field(None, description="Page range for PDF extraction (e.g., '1-3' or 'all')")
     rotate_degrees: Optional[int] = Field(None, description="Rotation angle for PDF or images (90, 180, 270)")
     indent: Optional[int] = Field(2, ge=0, le=8, description="Indentation for JSON, YAML, XML")
+    split_pdf: Optional[bool] = Field(False, description="Split multi-page PDF into separate single-page files")
 
 class ConvertedFileInfo(BaseModel):
     conversion_id: str

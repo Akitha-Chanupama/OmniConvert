@@ -11,13 +11,27 @@ async def check_health():
     pandoc_path = config.pandoc_path
     ffmpeg_path = config.ffmpeg_path
 
+    try:
+        import pillow_heif
+        has_heif = True
+    except Exception:
+        has_heif = False
+
+    try:
+        import pypdfium2
+        has_pdfium = True
+    except Exception:
+        has_pdfium = False
+
     return HealthResponse(
         status="ok",
         version="1.0.0",
         mode="local",
         installed_tools={
             "pillow": True,
+            "pillow_heif": has_heif,
             "pypdf": True,
+            "pypdfium2": has_pdfium,
             "openpyxl": True,
             "pyyaml": True,
             "defusedxml": True,

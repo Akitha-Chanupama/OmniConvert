@@ -73,8 +73,26 @@ def test_multiple_images_to_pdf(temp_dir: Path):
 
     assert pdf_out.exists()
     assert pdf_out.stat().st_size > 0
-
     from pypdf import PdfReader
     reader = PdfReader(str(pdf_out))
     assert len(reader.pages) == 2
+
+def test_heic_to_jpg(temp_dir: Path):
+    try:
+        import pillow_heif
+        pillow_heif.register_heif_opener()
+    except ImportError:
+        pytest.skip("pillow-heif not installed")
+
+    heic_path = temp_dir / "photo.heic"
+    Image.new("RGB", (100, 100), (0, 100, 200)).save(heic_path, format="HEIF")
+
+    converter = ImageConverter()
+    jpg_out = temp_dir / "photo.jpg"
+    converter.convert(heic_path, jpg_out)
+
+    assert jpg_out.exists()
+    assert jpg_out.stat().st_size > 0
+    with Image.open(jpg_out) as res:
+        assert res.size == (100, 100)
 

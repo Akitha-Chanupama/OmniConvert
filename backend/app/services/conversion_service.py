@@ -79,7 +79,7 @@ class ConversionService:
                 )
 
             # Special case 2: Multi-Image to Single PDF
-            is_all_images = all(p.suffix.lower().lstrip(".") in {"jpg", "jpeg", "png", "webp", "bmp", "tiff"} for p in saved_input_paths)
+            is_all_images = all(p.suffix.lower().lstrip(".") in {"jpg", "jpeg", "png", "webp", "bmp", "tiff", "heic", "heif"} for p in saved_input_paths)
             if merge_pdf and len(files) > 1 and target_ext == "pdf" and is_all_images:
                 compiled_output_path = output_dir / "compiled_images.pdf"
                 ImageConverter.convert_multiple_to_pdf(saved_input_paths, compiled_output_path)
@@ -102,6 +102,49 @@ class ConversionService:
                     items=[file_info],
                 )
 
+            # Special case 3: Split PDF into individual single-page files
+            if options and options.split_pdf and all(p.suffix.lower() == ".pdf" for p in saved_input_paths):
+                pdf_conv = PDFConverter()
+                split_output_paths: List[Path] = []
+                split_items: List[ConvertedFileInfo] = []
+
+                for input_path, orig_name in zip(saved_input_paths, original_filenames):
+                    pages = pdf_conv.split_pdf(input_path, output_dir, options)
+                    for p in pages:
+                        split_output_paths.append(p)
+                        split_items.append(
+                            ConvertedFileInfo(
+                                conversion_id=cid,
+                                original_filename=orig_name,
+                                converted_filename=p.name,
+                                target_format="pdf",
+                                file_size_bytes=p.stat().st_size,
+                                download_url=f"/api/v1/convert/{cid}/download?filename={p.name}",
+                            )
+                        )
+
+                if len(split_output_paths) > 1:
+                    zip_path = output_dir / "split_pdf_pages.zip"
+                    ArchiveService.create_zip(split_output_paths, zip_path)
+                    return BatchConversionResponse(
+                        success=True,
+                        message=f"Split PDF into {len(split_output_paths)} single-page files.",
+                        conversion_id=cid,
+                        is_zip=True,
+                        download_url=f"/api/v1/convert/{cid}/download?filename=split_pdf_pages.zip",
+                        items=split_items,
+                    )
+                elif len(split_output_paths) == 1:
+                    single_info = split_items[0]
+                    return BatchConversionResponse(
+                        success=True,
+                        message="Extracted single page from PDF.",
+                        conversion_id=cid,
+                        is_zip=False,
+                        download_url=single_info.download_url,
+                        items=split_items,
+                    )
+
 
             # 2. Standard Conversion
             converted_items: List[ConvertedFileInfo] = []
@@ -121,6 +164,25 @@ class ConversionService:
                     )
 
                 base_stem = Path(orig_name).stem
+
+                # PDF to Images multi-page expansion
+                if src_ext == "pdf" and target_ext in {"jpg", "jpeg", "png", "webp"}:
+                    pdf_conv = PDFConverter()
+                    rendered_images = pdf_conv.convert_pdf_to_images(input_path, output_dir, target_ext, options)
+                    for img_path in rendered_images:
+                        output_paths.append(img_path)
+                        converted_items.append(
+                            ConvertedFileInfo(
+                                conversion_id=cid,
+                                original_filename=orig_name,
+                                converted_filename=img_path.name,
+                                target_format=target_ext,
+                                file_size_bytes=img_path.stat().st_size,
+                                download_url=f"/api/v1/convert/{cid}/download?filename={img_path.name}",
+                            )
+                        )
+                    continue
+
                 out_filename = f"{base_stem}.{target_ext}"
                 out_path = output_dir / out_filename
 
