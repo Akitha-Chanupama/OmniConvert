@@ -1,15 +1,31 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { X, Download, Copy, Check, ExternalLink, Code2, Eye } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import {
+  X,
+  Download,
+  Copy,
+  Check,
+  ExternalLink,
+  Code2,
+  Eye,
+  SlidersHorizontal,
+  Columns2,
+  MoveHorizontal,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
 import { marked } from 'marked';
 import { formatBytes } from '../utils/formatters';
 import { ConversionApi } from '../services/conversionApi';
 
-interface PreviewModalProps {
+export interface PreviewModalProps {
   filename: string;
   downloadUrl: string;
   fileSizeBytes?: number;
   isOpen: boolean;
   onClose: () => void;
+  originalUrl?: string;
+  originalSizeBytes?: number;
+  originalFilename?: string;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -18,22 +34,50 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   fileSizeBytes,
   isOpen,
   onClose,
+  originalUrl,
+  originalSizeBytes,
+  originalFilename,
 }) => {
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loadingText, setLoadingText] = useState(false);
   const [viewSource, setViewSource] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Comparison & Split Slider State
+  const [compareMode, setCompareMode] = useState<'split' | 'side' | 'single'>('split');
+  const [sliderPos, setSliderPos] = useState<number>(50);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
   const fullUrl = ConversionApi.getFullDownloadUrl(downloadUrl);
   const ext = filename.split('.').pop()?.toLowerCase() || '';
 
-  const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'ico', 'svg'].includes(ext);
+  const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'ico', 'svg', 'avif', 'tiff'].includes(ext);
+  const originalExt = originalFilename ? originalFilename.split('.').pop()?.toLowerCase() || '' : '';
+  const isOriginalImage = originalExt
+    ? ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'ico', 'svg', 'avif', 'tiff'].includes(originalExt)
+    : true;
+  const hasComparison = isImage && !!originalUrl && isOriginalImage;
+
   const isPdf = ext === 'pdf';
   const isHtml = ext === 'html' || ext === 'htm';
   const isMarkdown = ext === 'md' || ext === 'markdown';
   const isTextLike = ['txt', 'md', 'markdown', 'json', 'yaml', 'yml', 'xml', 'csv', 'html', 'htm'].includes(ext);
   const canToggleRender = isHtml || isMarkdown;
 
+  // Reset comparison slider state when opened
+  useEffect(() => {
+    if (isOpen) {
+      setSliderPos(50);
+      setIsDragging(false);
+      if (hasComparison) {
+        setCompareMode('split');
+      }
+    }
+  }, [isOpen, hasComparison]);
+
+  // Load text preview if file is text-based
   useEffect(() => {
     if (isOpen && isTextLike && !isPdf) {
       setLoadingText(true);
@@ -51,6 +95,109 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       setTextContent(null);
     }
   }, [isOpen, fullUrl, isTextLike, isPdf]);
+
+  // Byte savings badge calculation
+  const savingsData = useMemo(() => {
+    if (originalSizeBytes === undefined || fileSizeBytes === undefined || originalSizeBytes <= 0) {
+      return null;
+    }
+    const diff = originalSizeBytes - fileSizeBytes;
+    const percent = Math.round((diff / originalSizeBytes) * 100);
+    const isSavings = diff > 0;
+    const isIncrease = diff < 0;
+
+    return {
+      diff,
+      percent: Math.abs(percent),
+      isSavings,
+      isIncrease,
+      badgeText: isSavings
+        ? `-${Math.abs(percent)}% • ${formatBytes(originalSizeBytes)} → ${formatBytes(fileSizeBytes)}`
+        : isIncrease
+        ? `+${Math.abs(percent)}% • ${formatBytes(originalSizeBytes)} → ${formatBytes(fileSizeBytes)}`
+        : `0% • ${formatBytes(originalSizeBytes)} → ${formatBytes(fileSizeBytes)}`,
+      savedSummary: isSavings
+        ? `${formatBytes(diff)} saved`
+        : isIncrease
+        ? `${formatBytes(Math.abs(diff))} larger`
+        : 'same size',
+    };
+  }, [originalSizeBytes, fileSizeBytes]);
+
+  // Slider dragging handlers
+  const updateSliderPosition = useCallback((clientX: number) => {
+    if (!imageContainerRef.current) return;
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const offsetX = clientX - rect.left;
+    const pct = Math.max(0, Math.min(100, (offsetX / rect.width) * 100));
+    setSliderPos(Math.round(pct * 10) / 10);
+  }, []);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    updateSliderPosition(e.clientX);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 0) {
+      setIsDragging(true);
+      updateSliderPosition(e.touches[0].clientX);
+    }
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      updateSliderPosition(e.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        updateSliderPosition(e.touches[0].clientX);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleMouseUp);
+    window.addEventListener('touchcancel', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleMouseUp);
+      window.removeEventListener('touchcancel', handleMouseUp);
+    };
+  }, [isDragging, updateSliderPosition]);
+
+  // Keyboard navigation (Escape to close, Left/Right arrow to nudge slider)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (hasComparison && compareMode === 'split') {
+        if (e.key === 'ArrowLeft') {
+          setSliderPos((prev) => Math.max(0, Math.round(prev - 2)));
+        } else if (e.key === 'ArrowRight') {
+          setSliderPos((prev) => Math.min(100, Math.round(prev + 2)));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose, hasComparison, compareMode]);
 
   // Build rendered HTML for Markdown
   const markdownHtmlDoc = useMemo(() => {
@@ -119,15 +266,18 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div
-        className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150"
+        className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60">
-          <div className="min-w-0 pr-4">
-            <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60">
+          <div className="min-w-0 pr-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate">
                 {filename}
               </h3>
@@ -136,15 +286,88 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                   Markdown
                 </span>
               )}
+
+              {/* Byte savings badge in header */}
+              {savingsData && (
+                <div
+                  className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold border transition-colors ${
+                    savingsData.isSavings
+                      ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-300/80 dark:border-emerald-800'
+                      : savingsData.isIncrease
+                      ? 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-300/80 dark:border-amber-800'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  }`}
+                  title={`${savingsData.badgeText} (${savingsData.savedSummary})`}
+                >
+                  {savingsData.isSavings ? (
+                    <TrendingDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  ) : savingsData.isIncrease ? (
+                    <TrendingUp className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                  ) : null}
+                  <span>{savingsData.badgeText}</span>
+                </div>
+              )}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {fileSizeBytes !== undefined && formatBytes(fileSizeBytes)} • {ext.toUpperCase()} Preview
+              {hasComparison && originalFilename && (
+                <span className="hidden sm:inline text-slate-400 dark:text-slate-500 ml-1.5">
+                  (Comparing with {originalFilename})
+                </span>
+              )}
             </p>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0">
+            {/* View Mode switcher for Before / After images */}
+            {hasComparison && (
+              <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setCompareMode('split')}
+                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                    compareMode === 'split'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Interactive split comparison slider"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Split Slider</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompareMode('side')}
+                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                    compareMode === 'side'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Side by side view"
+                >
+                  <Columns2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Side-by-Side</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompareMode('single')}
+                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                    compareMode === 'single'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Single image view"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Single</span>
+                </button>
+              </div>
+            )}
+
+            {/* Markdown / HTML toggle */}
             {canToggleRender && (
-              <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-semibold mr-2">
+              <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-semibold mr-1">
                 <button
                   type="button"
                   onClick={() => setViewSource(false)}
@@ -172,6 +395,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               </div>
             )}
 
+            {/* Copy button for text */}
             {textContent !== null && (
               <button
                 type="button"
@@ -184,6 +408,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               </button>
             )}
 
+            {/* Open Raw in New Tab */}
             <a
               href={fullUrl}
               target="_blank"
@@ -194,6 +419,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               <ExternalLink className="w-4 h-4" />
             </a>
 
+            {/* Download Button */}
             <a
               href={fullUrl}
               download={filename}
@@ -203,10 +429,12 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               <span>Download</span>
             </a>
 
+            {/* Close Modal */}
             <button
               type="button"
               onClick={onClose}
               className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer ml-1"
+              title="Close (Esc)"
             >
               <X className="w-5 h-5" />
             </button>
@@ -214,8 +442,181 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-950 flex items-center justify-center min-h-[350px]">
-          {isImage ? (
+        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-950 flex flex-col items-center justify-center min-h-[380px]">
+          {hasComparison && compareMode === 'split' ? (
+            /* Split Comparison Slider */
+            <div className="w-full flex-1 flex flex-col items-center justify-center space-y-4">
+              <div
+                className="relative inline-block max-w-full max-h-[60vh] rounded-2xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-md bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:16px_16px] cursor-ew-resize select-none touch-none group"
+                ref={imageContainerRef}
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouchStart}
+              >
+                {/* Background image: After (Converted / Compressed) */}
+                <img
+                  src={fullUrl}
+                  alt="Converted output"
+                  className="max-w-full max-h-[60vh] object-contain block pointer-events-none select-none"
+                  draggable={false}
+                />
+
+                {/* Foreground clipped image: Before (Original) */}
+                <div
+                  className="absolute inset-0 overflow-hidden pointer-events-none select-none"
+                  style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                >
+                  <img
+                    src={originalUrl}
+                    alt="Original"
+                    className="w-full h-full object-contain block pointer-events-none select-none"
+                    draggable={false}
+                  />
+                </div>
+
+                {/* Before badge top-left */}
+                <div className="absolute top-3 left-3 pointer-events-none select-none z-10">
+                  <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-white text-[11px] font-bold border border-white/10 shadow-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    <span>Before (Original)</span>
+                    {originalSizeBytes !== undefined && (
+                      <span className="text-slate-300 font-normal">({formatBytes(originalSizeBytes)})</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* After badge top-right */}
+                <div className="absolute top-3 right-3 pointer-events-none select-none z-10">
+                  <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-white text-[11px] font-bold border border-white/10 shadow-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>After (Output)</span>
+                    {fileSizeBytes !== undefined && (
+                      <span className="text-slate-300 font-normal">({formatBytes(fileSizeBytes)})</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Vertical Divider Line & Draggable Thumb Handle */}
+                <div
+                  className="absolute top-0 bottom-0 pointer-events-none z-20"
+                  style={{ left: `${sliderPos}%` }}
+                >
+                  <div className="absolute top-0 bottom-0 -left-[1.5px] w-[3px] bg-white shadow-[0_0_10px_rgba(0,0,0,0.6)]" />
+                  <div
+                    className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-900 text-slate-800 dark:text-white shadow-2xl border-2 border-white dark:border-slate-700 flex items-center justify-center pointer-events-auto cursor-ew-resize hover:scale-115 active:scale-95 transition-transform"
+                    title="Drag left or right to compare"
+                  >
+                    <MoveHorizontal className="w-4 h-4 text-slate-800 dark:text-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Slider Control Toolbar & Byte Savings Badge */}
+              <div className="w-full max-w-xl px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center space-x-2 w-full sm:w-auto flex-1">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
+                    Before
+                  </span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={sliderPos}
+                    onChange={(e) => setSliderPos(Number(e.target.value))}
+                    className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-ew-resize accent-blue-600"
+                    aria-label="Image comparison split slider"
+                  />
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
+                    After
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSliderPos(100)}
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
+                      sliderPos === 100
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    Original
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSliderPos(50)}
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
+                      sliderPos === 50
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    50/50 Split
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSliderPos(0)}
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer ${
+                      sliderPos === 0
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    Compressed
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : hasComparison && compareMode === 'side' ? (
+            /* Side-by-Side Comparison */
+            <div className="w-full flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 p-2 overflow-auto max-h-[72vh]">
+              {/* Original Image Card */}
+              <div className="flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+                <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Before (Original)
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    {originalSizeBytes !== undefined && formatBytes(originalSizeBytes)}
+                  </span>
+                </div>
+                <div className="flex-1 p-3 flex items-center justify-center bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:16px_16px] min-h-[280px]">
+                  <img
+                    src={originalUrl}
+                    alt="Original"
+                    className="max-w-full max-h-[50vh] object-contain rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Converted Output Card */}
+              <div className="flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+                <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      After (Converted)
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    {fileSizeBytes !== undefined && formatBytes(fileSizeBytes)}
+                  </span>
+                </div>
+                <div className="flex-1 p-3 flex items-center justify-center bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:16px_16px] min-h-[280px]">
+                  <img
+                    src={fullUrl}
+                    alt="Converted"
+                    className="max-w-full max-h-[50vh] object-contain rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : isImage ? (
+            /* Single Image View */
             <div className="flex items-center justify-center w-full h-full p-2">
               <img
                 src={fullUrl}

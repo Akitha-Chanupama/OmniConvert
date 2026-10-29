@@ -82,4 +82,7 @@ export interface ConversionHistoryItem {
   downloadUrl: string;
   fileSizeBytes: number;
   isZip: boolean;
+  originalSizeBytes?: number;
+  originalUrl?: string;
+  originalFilename?: string;
 }

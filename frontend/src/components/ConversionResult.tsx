@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Download, RefreshCw, Archive, Eye, Copy, Check } from 'lucide-react';
-import type { BatchConversionResponse, ConvertedFileInfo } from '../types';
+import { CheckCircle2, Download, RefreshCw, Archive, Eye, Copy, Check, TrendingDown, TrendingUp } from 'lucide-react';
+import type { BatchConversionResponse, ConvertedFileInfo, UploadedFileItem } from '../types';
 import { formatBytes } from '../utils/formatters';
 import { ConversionApi } from '../services/conversionApi';
 
@@ -8,12 +8,14 @@ interface ConversionResultProps {
   result: BatchConversionResponse;
   onReset: () => void;
   onPreview?: (item: ConvertedFileInfo) => void;
+  originalFiles?: UploadedFileItem[];
 }
 
 export const ConversionResult: React.FC<ConversionResultProps> = ({
   result,
   onReset,
   onPreview,
+  originalFiles,
 }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const fullDownloadUrl = ConversionApi.getFullDownloadUrl(result.download_url);
@@ -54,14 +56,36 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
           const isCopied = copiedKey === itemKey;
           const canCopy = isCopyable(item.converted_filename);
 
+          const orig = originalFiles?.find(
+            (f) => f.name.toLowerCase() === item.original_filename.toLowerCase()
+          );
+          const hasSavings = orig && orig.size > 0;
+          const diff = hasSavings ? orig.size - item.file_size_bytes : 0;
+          const pct = hasSavings && orig.size > 0 ? Math.round((diff / orig.size) * 100) : 0;
+
           return (
             <div key={idx} className="flex items-center justify-between p-3.5 sm:p-4 text-xs sm:text-sm">
               <div className="min-w-0 pr-4">
-                <p className="font-semibold text-slate-800 dark:text-slate-200 truncate" title={item.converted_filename}>
-                  {item.converted_filename}
-                </p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                <div className="flex items-center space-x-2">
+                  <p className="font-semibold text-slate-800 dark:text-slate-200 truncate" title={item.converted_filename}>
+                    {item.converted_filename}
+                  </p>
+                  {hasSavings && diff > 0 && (
+                    <span className="inline-flex items-center space-x-0.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800 shrink-0">
+                      <TrendingDown className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                      <span>-{pct}% ({formatBytes(diff)} saved)</span>
+                    </span>
+                  )}
+                  {hasSavings && diff < 0 && (
+                    <span className="inline-flex items-center space-x-0.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800 shrink-0">
+                      <TrendingUp className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                      <span>+{Math.abs(pct)}%</span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
                   {formatBytes(item.file_size_bytes)} • From {item.original_filename}
+                  {orig && ` (${formatBytes(orig.size)})`}
                 </p>
               </div>
               <div className="flex items-center space-x-2 shrink-0">
@@ -88,6 +112,7 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
 
                 {onPreview && (
                   <button
+                    data-testid="conversion-preview-btn"
                     type="button"
                     onClick={() => onPreview(item)}
                     className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
