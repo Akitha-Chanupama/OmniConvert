@@ -25,6 +25,7 @@ interface FileCardProps {
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   onPreview?: (item: UploadedFileItem) => void;
+  onOpenPdfStudio?: (file: File) => void;
   disabled?: boolean;
 }
 
@@ -117,6 +118,7 @@ export const FileCard: React.FC<FileCardProps> = ({
   canMoveUp = false,
   canMoveDown = false,
   onPreview,
+  onOpenPdfStudio,
   disabled = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -259,6 +261,19 @@ export const FileCard: React.FC<FileCardProps> = ({
 
         {/* Action Controls */}
         <div className="flex items-center space-x-1">
+          {/* Quick PDF Studio Button */}
+          {item.detectedExt.toLowerCase() === 'pdf' && onOpenPdfStudio && (
+            <button
+              type="button"
+              onClick={() => onOpenPdfStudio(item.file)}
+              className="px-2 py-1 bg-violet-50 dark:bg-violet-950/70 text-violet-600 dark:text-violet-300 hover:bg-violet-100 rounded-lg text-[11px] font-bold border border-violet-200 dark:border-violet-800 transition-colors flex items-center space-x-1 cursor-pointer mr-1"
+              title="Open in PDF Visual Studio to reorder, rotate & extract pages"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Studio</span>
+            </button>
+          )}
+
           {/* Quick Preview Button */}
           {onPreview && (
             <button

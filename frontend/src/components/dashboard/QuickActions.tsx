@@ -8,18 +8,32 @@ import {
   FileSpreadsheet,
   Database,
   FileCode,
+  Layers,
 } from 'lucide-react';
 
 interface QuickActionsProps {
   onSelectAction: (source: string, target: string) => void;
   onNavigateToTools?: () => void;
+  onOpenPdfStudio?: () => void;
 }
 
 export const QuickActions: React.FC<QuickActionsProps> = ({
   onSelectAction,
   onNavigateToTools,
+  onOpenPdfStudio,
 }) => {
   const actions = [
+    {
+      id: 'pdf-studio',
+      label: 'PDF Visual Studio',
+      desc: 'Reorder, rotate & extract',
+      source: 'PDF',
+      target: 'STUDIO',
+      isStudio: true,
+      icon: Layers,
+      iconColor: 'text-violet-600 dark:text-violet-400',
+      bgColor: 'bg-gradient-to-br from-violet-500/20 via-indigo-500/15 to-transparent border border-violet-500/30 shadow-xs shadow-violet-500/10',
+    },
     {
       id: 'pdf-md',
       label: 'PDF → Markdown',
@@ -49,16 +63,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       icon: ImageIcon,
       iconColor: 'text-rose-600 dark:text-rose-400',
       bgColor: 'bg-gradient-to-br from-rose-500/15 via-pink-500/10 to-transparent border border-rose-500/25 shadow-xs shadow-rose-500/10',
-    },
-    {
-      id: 'pdf-jpg',
-      label: 'PDF → JPG',
-      desc: 'High-res page images',
-      source: 'PDF',
-      target: 'JPG',
-      icon: FileText,
-      iconColor: 'text-sky-600 dark:text-sky-400',
-      bgColor: 'bg-gradient-to-br from-sky-500/15 via-cyan-500/10 to-transparent border border-sky-500/25 shadow-xs shadow-sky-500/10',
     },
     {
       id: 'excel-csv',
@@ -120,7 +124,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             <button
               key={act.id}
               type="button"
-              onClick={() => onSelectAction(act.source, act.target)}
+              onClick={() => {
+                if (act.isStudio && onOpenPdfStudio) {
+                  onOpenPdfStudio();
+                } else {
+                  onSelectAction(act.source, act.target);
+                }
+              }}
               className="group relative flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700/60 ring-1 ring-black/[0.02] dark:ring-white/[0.04] hover:shadow-md transition-all cursor-pointer text-left overflow-hidden"
             >
               <div className="flex items-center space-x-3.5 min-w-0 flex-1">
@@ -130,9 +140,16 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="block font-display text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                    {act.label}
-                  </span>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="font-display text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                      {act.label}
+                    </span>
+                    {act.isStudio && (
+                      <span className="px-1.5 py-0.2 text-[9px] font-black uppercase rounded bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400">
+                        Pro
+                      </span>
+                    )}
+                  </div>
                   <span className="block text-xs text-slate-500 dark:text-slate-400 truncate">
                     {act.desc}
                   </span>

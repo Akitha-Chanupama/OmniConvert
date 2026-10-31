@@ -86,3 +86,38 @@ export interface ConversionHistoryItem {
   originalUrl?: string;
   originalFilename?: string;
 }
+
+export interface PdfPageThumbnailItem {
+  id: string;
+  pageIndex: number;
+  pageNumber: number;
+  width: number;
+  height: number;
+  rotation: number;
+  thumbnailUrl: string;
+  selected?: boolean;
+}
+
+export interface PdfInspectResponse {
+  session_id: string;
+  filename: string;
+  file_size_bytes: number;
+  page_count: number;
+  pages: Array<{
+    page_index: number;
+    page_number: number;
+    width: number;
+    height: number;
+    rotation: number;
+    thumbnail_url: string;
+  }>;
+}
+
+export interface PdfCompileResponse {
+  success: boolean;
+  message: string;
+  download_url: string;
+  filename: string;
+  file_size_bytes: number;
+  page_count: number;
+}

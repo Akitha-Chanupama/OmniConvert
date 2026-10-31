@@ -3,6 +3,8 @@ import type {
   ConversionOptions,
   FormatsResponse,
   HealthResponse,
+  PdfInspectResponse,
+  PdfCompileResponse,
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -53,6 +55,62 @@ export class ConversionApi {
 
     if (!res.ok) {
       let errDetail = 'Conversion failed';
+      try {
+        const errorJson = await res.json();
+        errDetail = errorJson.detail || errDetail;
+      } catch {
+        errDetail = await res.text();
+      }
+      throw new Error(errDetail);
+    }
+
+    return res.json();
+  }
+
+  static async inspectPdf(file: File): Promise<PdfInspectResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE}/api/v1/pdf-studio/inspect`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      let errDetail = 'PDF inspection failed';
+      try {
+        const errorJson = await res.json();
+        errDetail = errorJson.detail || errDetail;
+      } catch {
+        errDetail = await res.text();
+      }
+      throw new Error(errDetail);
+    }
+
+    return res.json();
+  }
+
+  static async compilePdf(
+    sessionId: string,
+    filename: string,
+    pages: Array<{ page_index: number; rotation: number }>,
+    exportType: 'pdf' | 'images_zip' = 'pdf'
+  ): Promise<PdfCompileResponse> {
+    const res = await fetch(`${API_BASE}/api/v1/pdf-studio/compile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        filename,
+        pages,
+        export_type: exportType,
+      }),
+    });
+
+    if (!res.ok) {
+      let errDetail = 'PDF compilation failed';
       try {
         const errorJson = await res.json();
         errDetail = errorJson.detail || errDetail;

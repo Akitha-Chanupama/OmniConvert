@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from app.api.conversions import router as conversions_router
 from app.api.formats import router as formats_router
 from app.api.health import router as health_router
+from app.api.pdf_studio import router as pdf_studio_router
 from app.config import config
 from app.services.cleanup_service import cleanup_service
 
@@ -37,6 +38,7 @@ app.add_middleware(
 app.include_router(health_router, prefix="/api/v1")
 app.include_router(formats_router, prefix="/api/v1")
 app.include_router(conversions_router, prefix="/api/v1")
+app.include_router(pdf_studio_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
