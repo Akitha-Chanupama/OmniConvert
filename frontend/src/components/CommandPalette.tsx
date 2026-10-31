@@ -36,6 +36,7 @@ interface CommandPaletteProps {
   isDark: boolean;
   onNavigateToDashboard: () => void;
   onNavigateToTools: () => void;
+  onNavigateToPdfStudio?: () => void;
   onNavigateToSettings: () => void;
   onClearQueue?: () => void;
   hasQueueFiles?: boolean;
@@ -49,6 +50,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   isDark,
   onNavigateToDashboard,
   onNavigateToTools,
+  onNavigateToPdfStudio,
   onNavigateToSettings,
   onClearQueue,
   hasQueueFiles = false,
@@ -62,7 +64,24 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const allCommands: CommandItem[] = useMemo(() => {
     const list: CommandItem[] = [];
 
-    // 1. Tool Presets from Sidebar groups
+    // 1. PDF Studio action
+    if (onNavigateToPdfStudio) {
+      list.push({
+        id: 'nav-pdf-studio',
+        title: 'PDF Visual Studio',
+        subtitle: 'Reorder, rotate, delete & export PDF pages with live previews',
+        category: 'Actions',
+        icon: Layers,
+        accentColor: 'text-violet-500',
+        shortcut: 'P',
+        onSelect: () => {
+          onNavigateToPdfStudio();
+          onClose();
+        },
+      });
+    }
+
+    // 2. Tool Presets from Sidebar groups
     SIDEBAR_TOOL_GROUPS.forEach((group) => {
       group.tools.forEach((tool) => {
         let IconComp: React.ComponentType<{ className?: string }> = ImageIcon;
@@ -79,14 +98,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           icon: IconComp,
           accentColor: group.accentColor,
           onSelect: () => {
-            onSelectTool(tool.source, tool.target, tool.action);
+            if (tool.id === 'pdf-studio' && onNavigateToPdfStudio) {
+              onNavigateToPdfStudio();
+            } else {
+              onSelectTool(tool.source, tool.target, tool.action);
+            }
             onClose();
           },
         });
       });
     });
 
-    // 2. Actions & Navigation
+    // 3. Actions & Navigation
     list.push({
       id: 'nav-dashboard',
       title: 'Go to Dashboard',
@@ -164,6 +187,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     onSelectTool,
     onNavigateToDashboard,
     onNavigateToTools,
+    onNavigateToPdfStudio,
     onNavigateToSettings,
     onToggleTheme,
     isDark,
@@ -273,7 +297,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {filteredCommands.length === 0 ? (
             <div className="py-12 text-center text-slate-400 dark:text-slate-500">
               <p className="text-sm font-semibold">No matching tools or commands found</p>
-              <p className="text-xs mt-1">Try typing &apos;PDF&apos;, &apos;Markdown&apos;, &apos;Theme&apos;, or &apos;Image&apos;</p>
+              <p className="text-xs mt-1">Try typing &apos;PDF&apos;, &apos;Studio&apos;, &apos;Theme&apos;, or &apos;Image&apos;</p>
             </div>
           ) : (
             filteredCommands.map((cmd, idx) => {

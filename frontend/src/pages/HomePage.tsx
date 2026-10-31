@@ -28,6 +28,7 @@ import { getFileExtension, formatBytes } from '../utils/formatters';
 
 interface HomePageProps {
   onNavigateToTools?: () => void;
+  onOpenPdfStudio?: (file?: File) => void;
   presetTarget?: string | null;
   presetSource?: string | null;
   presetAction?: 'convert' | 'merge_pdf' | 'split_pdf' | null;
@@ -40,6 +41,7 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({
   onNavigateToTools,
+  onOpenPdfStudio,
   presetTarget,
   presetSource,
   presetAction,
@@ -496,6 +498,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       canMoveUp={idx > 0}
                       canMoveDown={idx < files.length - 1}
                       onPreview={handlePreviewUploaded}
+                      onOpenPdfStudio={onOpenPdfStudio}
                       disabled={isConverting}
                     />
                   ))}
@@ -508,6 +511,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <QuickActions
             onSelectAction={handleSelectQuickAction}
             onNavigateToTools={onNavigateToTools}
+            onOpenPdfStudio={onOpenPdfStudio}
           />
         </div>
 

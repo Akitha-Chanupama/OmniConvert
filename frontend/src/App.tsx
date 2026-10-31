@@ -4,18 +4,22 @@ import { TopHeader } from './components/layout/TopHeader';
 import { HomePage } from './pages/HomePage';
 import { ToolsPage } from './pages/ToolsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { PdfStudioPage } from './pages/PdfStudioPage';
 import { CommandPalette } from './components/CommandPalette';
 import { GlobalDropOverlay } from './components/GlobalDropOverlay';
 import { ShieldCheck } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'convert' | 'tools' | 'settings'>('convert');
+  const [activeTab, setActiveTab] = useState<'convert' | 'tools' | 'settings' | 'pdf-studio'>('convert');
   const [presetTarget, setPresetTarget] = useState<string | null>(null);
   const [presetSource, setPresetSource] = useState<string | null>(null);
   const [presetAction, setPresetAction] = useState<'convert' | 'merge_pdf' | 'split_pdf' | null>(null);
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Dedicated file for PDF Studio
+  const [pdfStudioFile, setPdfStudioFile] = useState<File | null>(null);
 
   // Cross-component communication for drag-and-drop & queue control
   const [droppedFiles, setDroppedFiles] = useState<File[] | null>(null);
@@ -85,13 +89,29 @@ export const App: React.FC = () => {
     setSelectedPresetId(null);
   };
 
+  const handleSelectPdfStudio = (fileToLoad?: File) => {
+    if (fileToLoad) {
+      setPdfStudioFile(fileToLoad);
+    }
+    setActiveTab('pdf-studio');
+    setSelectedPresetId('pdf-studio');
+  };
+
   const handleSelectToolFromCatalog = (source: string, target: string) => {
+    if (source.toUpperCase() === 'PDF' && target.toUpperCase() === 'STUDIO') {
+      handleSelectPdfStudio();
+      return;
+    }
     setPresetTarget(target);
     setPresetSource(source);
     setActiveTab('convert');
   };
 
   const handleGlobalFilesDropped = (files: File[]) => {
+    if (files.length === 1 && files[0].name.toLowerCase().endsWith('.pdf') && activeTab === 'pdf-studio') {
+      setPdfStudioFile(files[0]);
+      return;
+    }
     setDroppedFiles(files);
     setActiveTab('convert');
   };
@@ -117,6 +137,7 @@ export const App: React.FC = () => {
           setActiveTab('tools');
           setSelectedPresetId(null);
         }}
+        onNavigateToPdfStudio={handleSelectPdfStudio}
         onNavigateToSettings={handleSelectSettings}
         onClearQueue={() => setClearQueueTrigger((prev) => prev + 1)}
         hasQueueFiles={queueCount > 0}
@@ -128,6 +149,7 @@ export const App: React.FC = () => {
         selectedPreset={selectedPresetId}
         onSelectDashboard={handleSelectDashboard}
         onSelectTool={handleSelectToolPreset}
+        onSelectPdfStudio={handleSelectPdfStudio}
         onSelectSettings={handleSelectSettings}
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
@@ -149,6 +171,7 @@ export const App: React.FC = () => {
           {activeTab === 'convert' && (
             <HomePage
               onNavigateToTools={() => setActiveTab('tools')}
+              onOpenPdfStudio={handleSelectPdfStudio}
               presetTarget={presetTarget}
               presetSource={presetSource}
               presetAction={presetAction}
@@ -161,6 +184,14 @@ export const App: React.FC = () => {
               onClearExternalFiles={() => setDroppedFiles(null)}
               onQueueChange={setQueueCount}
               clearQueueTrigger={clearQueueTrigger}
+            />
+          )}
+
+          {activeTab === 'pdf-studio' && (
+            <PdfStudioPage
+              initialFile={pdfStudioFile}
+              onClearInitialFile={() => setPdfStudioFile(null)}
+              onNavigateToDashboard={handleSelectDashboard}
             />
           )}
 

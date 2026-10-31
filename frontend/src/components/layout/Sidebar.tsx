@@ -19,13 +19,15 @@ export interface ToolShortcut {
   target: string;
   category: 'image' | 'pdf' | 'document' | 'spreadsheet' | 'data';
   action?: 'convert' | 'merge_pdf' | 'split_pdf';
+  isStudio?: boolean;
 }
 
 interface SidebarProps {
-  activeTab: 'convert' | 'tools' | 'settings';
+  activeTab: 'convert' | 'tools' | 'settings' | 'pdf-studio';
   selectedPreset: string | null;
   onSelectDashboard: () => void;
   onSelectTool: (source: string, target: string, action?: 'convert' | 'merge_pdf' | 'split_pdf') => void;
+  onSelectPdfStudio?: () => void;
   onSelectSettings: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
@@ -52,6 +54,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     accentColor: 'text-violet-400',
     dotBg: 'bg-violet-500',
     tools: [
+      { id: 'pdf-studio', label: 'PDF Visual Studio', source: 'PDF', target: 'STUDIO', isStudio: true },
       { id: 'pdf-to-md', label: 'PDF to Markdown', source: 'PDF', target: 'MD' },
       { id: 'pdf-to-jpg', label: 'PDF to JPG', source: 'PDF', target: 'JPG' },
       { id: 'jpg-to-pdf', label: 'JPG to PDF', source: 'JPG', target: 'PDF' },
@@ -101,6 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   selectedPreset,
   onSelectDashboard,
   onSelectTool,
+  onSelectPdfStudio,
   onSelectSettings,
   isOpenMobile,
   onCloseMobile,
@@ -190,14 +194,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="space-y-0.5">
                   {group.tools.map((tool) => {
                     const isSelected =
-                      activeTab === 'convert' && selectedPreset === tool.id;
+                      (tool.isStudio && activeTab === 'pdf-studio') ||
+                      (activeTab === 'convert' && selectedPreset === tool.id);
 
                     return (
                       <button
                         key={tool.id}
                         type="button"
                         onClick={() => {
-                          onSelectTool(tool.source, tool.target, tool.action);
+                          if (tool.isStudio && onSelectPdfStudio) {
+                            onSelectPdfStudio();
+                          } else {
+                            onSelectTool(tool.source, tool.target, tool.action);
+                          }
                           onCloseMobile();
                         }}
                         className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-display font-medium transition-all cursor-pointer group ${
@@ -216,9 +225,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           />
                           <span>{tool.label}</span>
                         </div>
-                        {isSelected && (
+                        {tool.isStudio ? (
+                          <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md bg-gradient-to-r from-violet-500 to-indigo-500 text-white shadow-2xs">
+                            Studio
+                          </span>
+                        ) : isSelected ? (
                           <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
-                        )}
+                        ) : null}
                       </button>
                     );
                   })}
