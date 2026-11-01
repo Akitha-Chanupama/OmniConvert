@@ -3,7 +3,7 @@ import { Search, Sun, Moon, ShieldCheck, Menu } from 'lucide-react';
 
 interface TopHeaderProps {
   isDark: boolean;
-  onToggleTheme: () => void;
+  onToggleTheme: (e?: React.MouseEvent) => void;
   onOpenMobileMenu: () => void;
   onSelectTool: (source: string, target: string, action?: 'convert' | 'merge_pdf' | 'split_pdf') => void;
   onOpenCommandPalette: () => void;
@@ -64,11 +64,22 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <button
           type="button"
           onClick={onToggleTheme}
-          className="p-2 sm:p-2.5 rounded-full border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] transition-colors cursor-pointer shrink-0"
+          className="p-2 sm:p-2.5 rounded-full border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shrink-0"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label="Toggle theme"
         >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          <span className="relative flex items-center justify-center w-4 h-4 overflow-hidden">
+            <Sun
+              className={`w-4 h-4 text-amber-500 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform ${
+                isDark ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
+              }`}
+            />
+            <Moon
+              className={`w-4 h-4 text-amber-400 absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform ${
+                isDark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'
+              }`}
+            />
+          </span>
         </button>
 
         {/* Live Engine Status Badge */}

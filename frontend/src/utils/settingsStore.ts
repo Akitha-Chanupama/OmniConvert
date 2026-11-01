@@ -53,7 +53,17 @@ export function getSettings(): AppSettings {
   }
 }
 
-export function saveSettings(partial: Partial<AppSettings>): AppSettings {
+export interface ThemeTransitionOrigin {
+  x?: number;
+  y?: number;
+}
+
+let themeTransitionTimer: number | null = null;
+
+export function saveSettings(
+  partial: Partial<AppSettings>,
+  origin?: ThemeTransitionOrigin
+): AppSettings {
   const current = getSettings();
   const updated: AppSettings = { ...current, ...partial };
 
@@ -69,12 +79,12 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
     console.error('Failed to save settings:', err);
   }
 
-  applySettingsToDOM(updated);
+  applySettingsToDOM(updated, origin);
   window.dispatchEvent(new CustomEvent(SETTINGS_EVENT, { detail: updated }));
   return updated;
 }
 
-export function resetSettings(): AppSettings {
+export function resetSettings(origin?: ThemeTransitionOrigin): AppSettings {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('omniconvert_theme');
@@ -82,17 +92,17 @@ export function resetSettings(): AppSettings {
     console.error('Failed to reset settings:', err);
   }
 
-  applySettingsToDOM(DEFAULT_SETTINGS);
+  applySettingsToDOM(DEFAULT_SETTINGS, origin);
   window.dispatchEvent(new CustomEvent(SETTINGS_EVENT, { detail: DEFAULT_SETTINGS }));
   return DEFAULT_SETTINGS;
 }
 
-export function applySettingsToDOM(settings: AppSettings) {
+export function applySettingsToDOM(settings: AppSettings, origin?: ThemeTransitionOrigin) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
 
-  // 1. Theme application
+  // 1. Theme application with smooth circular ripple or progressive cross-fade
   let isDark = false;
   if (settings.theme === 'system') {
     isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -100,10 +110,81 @@ export function applySettingsToDOM(settings: AppSettings) {
     isDark = settings.theme === 'dark';
   }
 
-  if (isDark) {
-    root.classList.add('dark');
+  const currentIsDark = root.classList.contains('dark');
+  const themeChanged = currentIsDark !== isDark;
+
+  const executeThemeChange = () => {
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  };
+
+  if (themeChanged) {
+    const isReducedMotion =
+      settings.motion === 'reduced' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // View Transitions API (Modern Chromium & Safari 18+)
+    const docWithVT = document as unknown as {
+      startViewTransition?: (cb: () => void) => {
+        ready: Promise<void>;
+      };
+    };
+
+    if (typeof docWithVT.startViewTransition === 'function' && !isReducedMotion) {
+      try {
+        const x = origin?.x ?? window.innerWidth / 2;
+        const y = origin?.y ?? window.innerHeight / 2;
+        const endRadius = Math.hypot(
+          Math.max(x, window.innerWidth - x),
+          Math.max(y, window.innerHeight - y)
+        );
+
+        const transition = docWithVT.startViewTransition(() => {
+          executeThemeChange();
+        });
+
+        transition.ready
+          .then(() => {
+            root.animate(
+              {
+                clipPath: [
+                  `circle(0px at ${x}px ${y}px)`,
+                  `circle(${endRadius}px at ${x}px ${y}px)`,
+                ],
+              },
+              {
+                duration: 480,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                pseudoElement: '::view-transition-new(root)',
+              }
+            );
+          })
+          .catch(() => {
+            // Silently ignore if transition is canceled or interrupted
+          });
+      } catch {
+        executeThemeChange();
+      }
+    } else if (!isReducedMotion) {
+      // Smooth CSS color & background interpolation fallback
+      root.classList.add('theme-transitioning');
+      executeThemeChange();
+
+      if (themeTransitionTimer !== null) {
+        window.clearTimeout(themeTransitionTimer);
+      }
+      themeTransitionTimer = window.setTimeout(() => {
+        root.classList.remove('theme-transitioning');
+        themeTransitionTimer = null;
+      }, 450);
+    } else {
+      executeThemeChange();
+    }
   } else {
-    root.classList.remove('dark');
+    executeThemeChange();
   }
 
   // 2. Font Size Scaling
@@ -163,3 +244,4 @@ export function subscribeSettings(callback: (settings: AppSettings) => void): ()
     }
   };
 }
+
