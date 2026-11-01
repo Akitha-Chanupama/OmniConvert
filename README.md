@@ -266,6 +266,40 @@ npm run dev
 
 ---
 
+## Production Hosting & Deployment
+
+OmniConvert is packaged for single-container production deployment using Docker. The multi-stage `Dockerfile` bundles the compiled React frontend, FastAPI backend, and all native Debian converter engines (`libreoffice-nogui`, `pandoc`, `poppler-utils`, `weasyprint`).
+
+### 1. Deploy with Docker Compose (Local or VPS)
+
+```bash
+# Clone and build
+git clone https://github.com/Akitha-Chanupama/OmniConvert.git
+cd OmniConvert
+
+# Start production container
+docker compose up -d --build
+```
+The app will be live at `http://localhost:8000`.
+
+### 2. Deploy to Railway, Render, or Fly.io
+
+1. Create a new service from your GitHub repository.
+2. Select **Dockerfile** as the build source (root `Dockerfile`).
+3. Set Environment Variables:
+   - `APP_MODE=hosted`
+   - `PORT=8000` (Railway/Render automatically provides dynamic `$PORT`)
+   - `MAX_UPLOAD_SIZE_MB=50`
+   - `ALLOW_ALL_ORIGINS=true`
+4. Deploy! The single container serves both the web UI and the conversion API with automated background cleanup.
+
+### 3. Split Architecture (Vercel + Railway/Render)
+
+- **Frontend**: Deploy `frontend/` to Vercel or Netlify. Set `VITE_API_BASE_URL=https://your-api.railway.app`.
+- **Backend**: Deploy `backend/` using `backend/Dockerfile` to Railway/Render. Set `CORS_ORIGINS=https://your-frontend.vercel.app`.
+
+---
+
 ## Troubleshooting & Limitations
 
 - **"LibreOffice not found"**: Ensure `soffice` is in your Windows `PATH` if you wish to convert DOCX to PDF.
