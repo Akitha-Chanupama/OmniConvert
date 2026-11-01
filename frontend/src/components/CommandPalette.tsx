@@ -14,6 +14,9 @@ import {
   LayoutDashboard,
   CornerDownLeft,
   X,
+  Sparkles,
+  History,
+  Download,
 } from 'lucide-react';
 import { SIDEBAR_TOOL_GROUPS } from './layout/Sidebar';
 
@@ -40,6 +43,10 @@ interface CommandPaletteProps {
   onNavigateToSettings: () => void;
   onClearQueue?: () => void;
   hasQueueFiles?: boolean;
+  onOpenPasteSnippet?: () => void;
+  onOpenHistory?: () => void;
+  onInstallApp?: () => void;
+  isInstallable?: boolean;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -54,6 +61,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onNavigateToSettings,
   onClearQueue,
   hasQueueFiles = false,
+  onOpenPasteSnippet,
+  onOpenHistory,
+  onInstallApp,
+  isInstallable = false,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -151,6 +162,53 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         onClose();
       },
     });
+
+    if (onOpenPasteSnippet) {
+      list.push({
+        id: 'paste-snippet',
+        title: 'Paste Raw Text or Code',
+        subtitle: 'Convert Markdown, JSON, or text directly to PDF/CSV',
+        category: 'Actions',
+        icon: Sparkles,
+        accentColor: 'text-blue-500',
+        shortcut: 'P',
+        onSelect: () => {
+          onOpenPasteSnippet();
+          onClose();
+        },
+      });
+    }
+
+    if (onOpenHistory) {
+      list.push({
+        id: 'view-history',
+        title: 'Conversion History',
+        subtitle: 'View recent conversions and re-download past files',
+        category: 'Actions',
+        icon: History,
+        accentColor: 'text-amber-500',
+        shortcut: 'H',
+        onSelect: () => {
+          onOpenHistory();
+          onClose();
+        },
+      });
+    }
+
+    if (isInstallable && onInstallApp) {
+      list.push({
+        id: 'install-pwa',
+        title: 'Install as Desktop App',
+        subtitle: 'Launch OmniConvert in a distraction-free window',
+        category: 'System',
+        icon: Download,
+        accentColor: 'text-emerald-500',
+        onSelect: () => {
+          onInstallApp();
+          onClose();
+        },
+      });
+    }
 
     list.push({
       id: 'toggle-theme',

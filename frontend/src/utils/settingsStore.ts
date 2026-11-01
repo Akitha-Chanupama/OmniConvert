@@ -8,6 +8,7 @@ export interface AppSettings {
   theme: ThemeMode;
   fontSize: FontSizeMode;
   motion: MotionMode;
+  soundEffects: boolean;
 
   // Conversion Defaults
   defaultQuality: number;
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
   fontSize: 'normal',
   motion: 'smooth',
+  soundEffects: true,
   defaultQuality: 80,
   defaultTarget: 'auto',
   preserveAspectRatio: true,

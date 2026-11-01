@@ -3,7 +3,9 @@ import {
   Settings,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
+import { formatBytes } from '../utils/formatters';
 import type { ConversionOptions } from '../types';
 
 interface ConversionSettingsProps {
@@ -20,6 +22,7 @@ interface ConversionSettingsProps {
   mergePdf?: boolean;
   onToggleMergePdf?: (merge: boolean) => void;
   disabled?: boolean;
+  totalRawSizeBytes?: number;
 }
 
 export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
@@ -36,6 +39,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
   mergePdf = false,
   onToggleMergePdf,
   disabled = false,
+  totalRawSizeBytes = 0,
 }) => {
   // Preset default 8 formats if available, otherwise fallback to available targets
   const standardFormats = ['PNG', 'JPG', 'WEBP', 'PDF', 'DOCX', 'XLSX', 'CSV', 'JSON'];
@@ -53,6 +57,23 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
   const isLossyImage = ['JPG', 'JPEG', 'WEBP'].includes(targetUpper);
   const isImageTarget = ['JPG', 'JPEG', 'PNG', 'WEBP', 'BMP', 'TIFF', 'ICO'].includes(targetUpper);
   const isPdfTarget = targetUpper === 'PDF';
+
+  // Real-time estimated output file size based on format & compression settings
+  const estimatedOutput = React.useMemo(() => {
+    if (!totalRawSizeBytes || totalRawSizeBytes === 0 || !isImageTarget) return null;
+    const quality = options.quality ?? 80;
+    let ratio = 0.8;
+    if (targetUpper === 'WEBP') {
+      ratio = 0.08 + (quality / 100) * 0.45;
+    } else if (targetUpper === 'JPG' || targetUpper === 'JPEG') {
+      ratio = 0.12 + (quality / 100) * 0.60;
+    } else if (targetUpper === 'PNG') {
+      ratio = 0.75;
+    }
+    const estimated = Math.max(512, Math.round(totalRawSizeBytes * ratio));
+    const savingsPct = Math.max(0, Math.round((1 - estimated / totalRawSizeBytes) * 100));
+    return { estimated, savingsPct };
+  }, [totalRawSizeBytes, isImageTarget, targetUpper, options.quality]);
 
   const updateOption = <K extends keyof ConversionOptions>(key: K, value: ConversionOptions[K]) => {
     onChangeOptions({
@@ -211,6 +232,19 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
             <span>Balanced (60%)</span>
             <span>Best Quality (100%)</span>
           </div>
+
+          {/* Real-time Estimated File Size Badge */}
+          {estimatedOutput && totalRawSizeBytes > 0 && (
+            <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 shadow-2xs">
+              <div className="flex items-center space-x-1.5 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Est. Output: ~{formatBytes(estimatedOutput.estimated)}</span>
+              </div>
+              <span className="font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-200/70 dark:bg-emerald-900/60 text-[10px] text-emerald-800 dark:text-emerald-200">
+                ~{estimatedOutput.savingsPct}% smaller
+              </span>
+            </div>
+          )}
         </div>
       )}
 
