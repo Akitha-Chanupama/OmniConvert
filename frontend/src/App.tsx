@@ -167,7 +167,7 @@ export const App: React.FC = () => {
         />
 
         {/* Content Canvas */}
-        <main className="flex-1 max-w-[1480px] w-full mx-auto px-4 sm:px-8 pt-6 sm:pt-8">
+        <main className="flex-1 max-w-[1480px] w-full mx-auto px-3.5 sm:px-8 pt-4 sm:pt-8">
           {activeTab === 'convert' && (
             <HomePage
               onNavigateToTools={() => setActiveTab('tools')}
@@ -203,8 +203,8 @@ export const App: React.FC = () => {
         </main>
 
         {/* Bottom Footer */}
-        <footer className="border-t border-slate-200/80 dark:border-slate-800/80 py-4.5 text-xs transition-colors mt-auto bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
-          <div className="max-w-[1480px] mx-auto px-4 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-3.5 text-center md:text-left">
+        <footer className="border-t border-slate-200/80 dark:border-slate-800/80 py-4 text-xs transition-colors mt-auto bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
+          <div className="max-w-[1480px] mx-auto px-3.5 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
             <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-300 font-medium text-xs">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>

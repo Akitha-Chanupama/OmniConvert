@@ -62,7 +62,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs space-y-5 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
@@ -74,7 +74,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           </h3>
         </div>
 
-        <span className="font-display text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-3 py-1.5 rounded-full">
+        <span className="font-display text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full shrink-0">
           {filesCount > 0 ? 'Ready to Configure' : 'Waiting for files'}
         </span>
       </div>
@@ -90,7 +90,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           {displayFormats.slice(0, 8).map((fmt) => {
             const isSelected = selectedTarget.toLowerCase() === fmt.toLowerCase();
             const isSupported =
@@ -103,7 +103,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
                 type="button"
                 onClick={() => isSupported && onSelectTarget(fmt)}
                 disabled={disabled || !isSupported}
-                className={`py-3 px-3 rounded-xl font-display text-sm font-bold uppercase transition-all cursor-pointer ${
+                className={`py-2.5 sm:py-3 px-1 sm:px-3 rounded-xl font-display text-xs sm:text-sm font-bold uppercase transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/35 ring-2 ring-blue-500/40 scale-[1.02]'
                     : isSupported
