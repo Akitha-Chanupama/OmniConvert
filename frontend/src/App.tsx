@@ -51,8 +51,9 @@ export const App: React.FC = () => {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false));
 
-  const toggleTheme = () => {
-    saveSettings({ theme: isDark ? 'light' : 'dark' });
+  const toggleTheme = (e?: React.MouseEvent) => {
+    const origin = e ? { x: e.clientX, y: e.clientY } : undefined;
+    saveSettings({ theme: isDark ? 'light' : 'dark' }, origin);
   };
 
   // Global Keyboard Shortcuts (Ctrl + K or / to trigger Command Palette)
