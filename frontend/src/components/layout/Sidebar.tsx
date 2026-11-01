@@ -241,7 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Bottom Footer Item: Diagnostics & Settings */}
+        {/* Bottom Footer Item: Settings & Options */}
         <div className="p-4 border-t border-[#1a233a] shrink-0 bg-[#0a1120]">
           <button
             type="button"
@@ -257,7 +257,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <div className="flex items-center space-x-2.5">
               <Settings className="w-4.5 h-4.5 text-slate-400" />
-              <span>Diagnostics & Settings</span>
+              <span>Settings & Options</span>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-500" />
           </button>

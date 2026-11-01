@@ -140,8 +140,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
     list.push({
       id: 'nav-settings',
-      title: 'Diagnostics & Settings',
-      subtitle: 'Check local CLI engines and health status',
+      title: 'Settings & Options',
+      subtitle: 'Personalize appearance, font scale, conversion defaults & diagnostics',
       category: 'System',
       icon: Settings,
       accentColor: 'text-slate-500',

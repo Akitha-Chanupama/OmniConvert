@@ -25,6 +25,7 @@ import type {
 } from '../types';
 import { ConversionApi } from '../services/conversionApi';
 import { getFileExtension, formatBytes } from '../utils/formatters';
+import { getSettings, subscribeSettings } from '../utils/settingsStore';
 
 interface HomePageProps {
   onNavigateToTools?: () => void;
@@ -57,9 +58,12 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [files, setFiles] = useState<UploadedFileItem[]>([]);
   const [selectedTarget, setSelectedTarget] = useState<string>('');
   const [mergePdf, setMergePdf] = useState(false);
-  const [options, setOptions] = useState<ConversionOptions>({
-    quality: 80,
-    preserve_aspect_ratio: true,
+  const [options, setOptions] = useState<ConversionOptions>(() => {
+    const cur = getSettings();
+    return {
+      quality: cur.defaultQuality,
+      preserve_aspect_ratio: cur.preserveAspectRatio,
+    };
   });
 
   const [isConverting, setIsConverting] = useState(false);
@@ -96,6 +100,18 @@ export const HomePage: React.FC<HomePageProps> = ({
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  // Sync settings when modified from Settings page
+  useEffect(() => {
+    const unsubscribe = subscribeSettings((newSettings) => {
+      setOptions((prev) => ({
+        ...prev,
+        quality: newSettings.defaultQuality,
+        preserve_aspect_ratio: newSettings.preserveAspectRatio,
+      }));
+    });
+    return unsubscribe;
   }, []);
 
   // Handle preset if provided
@@ -309,6 +325,20 @@ export const HomePage: React.FC<HomePageProps> = ({
       };
 
       setConversionResult(combinedRes);
+
+      // Auto-download result if preference is enabled
+      if (getSettings().autoDownload && combinedRes.download_url) {
+        try {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = combinedRes.download_url;
+          downloadLink.setAttribute('download', '');
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        } catch (e) {
+          console.warn('Auto-download was blocked or failed:', e);
+        }
+      }
 
       // Add to session history
       const matchingFile = files.find(
