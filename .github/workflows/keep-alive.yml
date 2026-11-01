@@ -1,0 +1,26 @@
+name: Keep-Alive Production Ping
+
+on:
+  schedule:
+    # Ping every 14 minutes to prevent Render free-tier instance from sleeping (spins down after 15m)
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping OmniConvert Health Endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Production Health Check
+        run: |
+          echo "Pinging OmniConvert at https://omniconvert-jzx7.onrender.com/api/v1/health..."
+          response=$(curl -s -w "\n%{http_code}" "https://omniconvert-jzx7.onrender.com/api/v1/health")
+          http_code=$(echo "$response" | tail -n 1)
+          body=$(echo "$response" | sed '$d')
+          echo "HTTP Status Code: $http_code"
+          echo "Response Body: $body"
+          if [ "$http_code" -ne 200 ]; then
+            echo "Health check failed or timed out with status $http_code"
+            exit 1
+          fi
+          echo "OmniConvert instance is warm, awake, and healthy!"
