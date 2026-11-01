@@ -1,335 +1,220 @@
 # OmniConvert
 
-> **Convert files. Keep it simple.**
-> A personal-first, privacy-focused, zero-external-API file conversion web application.
+<div align="center">
 
-OmniConvert allows you to upload files, select supported target formats, convert them locally using free open-source tools and Python libraries, preview results, and download converted outputs.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-omniconvert--jzx7.onrender.com-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://omniconvert-jzx7.onrender.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![React 19](https://img.shields.io/badge/Frontend-React_19_•_Vite_•_Tailwind-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI_•_Python_3.12-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docker Ready](https://img.shields.io/badge/Deployment-Docker_Multi--Stage-2496ED?style=for-the-badge&logo=docker&logoColor=white)](Dockerfile)
+[![PWA Installable](https://img.shields.io/badge/PWA-Desktop_App_Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://omniconvert-jzx7.onrender.com/)
 
-No paid subscriptions, no cloud uploads, no forced accounts, and no third-party conversion APIs. Everything runs on your machine.
+<br />
 
----
+**Convert files. Keep it simple.**  
+*A high-performance, privacy-focused file conversion suite with zero cloud tracking and zero forced subscriptions.*
 
-## Table of Contents
+[**Explore Live Demo**](https://omniconvert-jzx7.onrender.com/) • [**Report Bug**](https://github.com/Akitha-Chanupama/OmniConvert/issues) • [**Request Feature**](https://github.com/Akitha-Chanupama/OmniConvert/issues)
 
-- [Features](#features)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Project Structure](#project-structure)
-- [Supported Conversion Matrix](#supported-conversion-matrix)
-- [System Requirements & Dependencies](#system-requirements--dependencies)
-- [Quick Start (Windows)](#quick-start-windows)
-- [Quick Start (Linux / macOS)](#quick-start-linux--macos)
-- [API Reference](#api-reference)
-- [Security & Privacy](#security--privacy)
-- [Troubleshooting & Limitations](#troubleshooting--limitations)
-- [Implementation Checklist](#implementation-checklist)
+</div>
 
 ---
 
-## Features
+## Overview
 
-- **100% Local Processing**: Your files never leave `127.0.0.1`.
-- **Dynamic Format Matrix**: The UI adapts dynamically to capabilities supported by installed backend tools.
-- **Images**: Fast conversions between JPEG, PNG, WebP, BMP, TIFF, GIF, and ICO with transparency preservation, quality control, and dimensions detection.
-- **Documents & Text**: TXT, Markdown, HTML, JSON, YAML, CSV, and Excel (XLSX).
-- **PDF Suite**: Images-to-PDF, TXT-to-PDF, PDF page extraction, split, merge, rotation, and metadata extraction.
-- **Office Conversion Ready**: Pluggable architecture supporting LibreOffice headless conversions (DOCX/XLSX to PDF).
-- **Batch Processing & ZIP Download**: Convert multiple files in a single pass and download individual files or a merged ZIP.
-- **Automatic Lifecycle Cleanup**: Isolated per-conversion working directories with automatic cleanup.
+**OmniConvert** is an all-in-one local-first file converter and PDF visual studio. It allows you to convert images, documents, spreadsheets, data structures, and PDFs quickly and securely.
+
+- **Zero Cloud APIs**: No data ever leaves your control. No third-party conversion APIs or paid credit limits.
+- **Single-Container Architecture**: Node 20 Vite frontend + Python 3.12 FastAPI backend compiled into a single Docker image with embedded native conversion engines (`libreoffice-nogui`, `pandoc`, `ffmpeg`, `poppler-utils`).
+- **Live Production Deployment**: Hosted 100% free on Render at **[https://omniconvert-jzx7.onrender.com/](https://omniconvert-jzx7.onrender.com/)**.
+
+---
+
+## Features at a Glance
+
+### 🖼️ Image Conversion & Optimization
+- Converts between **JPG**, **PNG**, **WebP**, **BMP**, **TIFF**, **GIF**, and **ICO**.
+- Transparent alpha channel handling (flattens PNG/WebP with customizable matte background for JPG).
+- Interactive quality compression slider with **real-time estimated output file size**.
+- Dimension resizing with aspect-ratio locking.
+- Interactive **before-and-after visual preview** with side-by-side and split-comparison sliders.
+
+### 📄 PDF Visual Studio
+- Dedicated PDF workspace (`/pdf-studio`) with visual page cards rendered via PDFium.
+- **Drag-and-drop page reordering** with instant position updates.
+- **Per-page rotation** (90° CW / CCW) and bulk rotation.
+- **Page exclusion/deletion** with one-click restore.
+- Export as merged PDF or extract every page as a high-resolution JPG packaged in a ZIP.
+
+### ⚡ Power Tools & Productivity
+- **Instant Snippet Paste**: Convert raw Markdown, JSON, CSV, or plain text to PDF/CSV/HTML directly from your clipboard without saving files to disk first.
+- **Conversion History Drawer**: Slide-over drawer tracking your last 50 conversions in browser `localStorage` with instant re-download links.
+- **Audio Completion Chimes**: Subtle, harmonic major-chord synthesizer cues on batch completion (customizable in Settings).
+- **Progressive Web App (PWA)**: Installable as a standalone native desktop app on Chrome, Edge, and Safari with offline caching shell.
+- **Command Palette (`Ctrl + K` or `/`)**: Quick-switch formats, jump to PDF Studio, search tools, or trigger conversions via keyboard shortcuts.
+- **Smooth Dark / Light Modes**: Flawless system-adaptive theme toggle with smooth CSS-based color transitions.
+
+### 📊 Documents, Spreadsheets & Data
+- **Office Documents**: Headless LibreOffice integration converts DOCX $\to$ PDF/TXT and XLSX $\to$ PDF.
+- **Spreadsheets**: Bi-directional conversion between XLSX, CSV, and JSON table structures.
+- **Data Formats**: Structured conversions between JSON, YAML, and XML with safe indentation and entity injection protection.
+- **Batch Processing**: Parallel file upload with ZIP packaging or individual downloads.
+
+---
+
+## Live Production Deployment
+
+OmniConvert is deployed live and hosted on Render:
+
+🔗 **[https://omniconvert-jzx7.onrender.com/](https://omniconvert-jzx7.onrender.com/)**
+
+### 1-Click Render Blueprint
+The repository includes [`render.yaml`](render.yaml) for automated Blueprint deployment:
+1. Fork or push this repository to your GitHub account.
+2. In [Render Dashboard](https://dashboard.render.com), click **New +** $\to$ **Blueprint**.
+3. Select your repository. Render automatically provisions the Docker container on its Free Tier with automated health checks at `/api/v1/health`.
+
+### 24/7 Keep-Alive (Zero Cold Starts)
+Render's free tier spins down instances after 15 minutes of inactivity. To ensure 0-second instant response times:
+- **Built-in GitHub Action**: A scheduled workflow [`.github/workflows/keep-alive.yml`](.github/workflows/keep-alive.yml) runs every 14 minutes to ping the `/api/v1/health` endpoint.
+- **External Free Pingers**: You can also add `https://omniconvert-jzx7.onrender.com/api/v1/health` to a free monitoring service like [UptimeRobot](https://uptimerobot.com) or [Cron-Job.org](https://cron-job.org) set to a 10-minute interval.
 
 ---
 
 ## Architecture & Tech Stack
 
-OmniConvert is organized as a clean monorepo:
-
-```
-Browser UI (React + Vite + Tailwind)
-       │
-       ▼ (REST HTTP / Multipart)
-FastAPI Backend (127.0.0.1:8000)
-       │
-       ▼
-Conversion Registry (Capability & Engine Discovery)
-       ├── Image Engine (Pillow)
-       ├── Text / Data Engine (Python native, PyYAML, defusedxml)
-       ├── Spreadsheet Engine (openpyxl, csv)
-       ├── PDF Engine (pypdf, Pillow)
-       └── Subprocess Adapters (LibreOffice, Pandoc, FFmpeg - detected dynamically)
-       │
-       ▼
-Isolated Scratch Storage (backend/temp/{conversion_id})
-       │
-       ▼
-Synchronous Return / Short-lived Download Endpoint
-```
-
-### Frontend
-- **React 18/19** with **Vite**
-- **TypeScript** (Strict Mode)
-- **Tailwind CSS**
-- **Lucide React** (Icons)
-
-### Backend
-- **Python 3.11+ / 3.12**
-- **FastAPI** + **Uvicorn**
-- **Pydantic v2**
-- **Pillow** (Image conversions)
-- **pypdf** (PDF manipulations & mergers)
-- **openpyxl** (Excel spreadsheet processing)
-- **PyYAML** (Safe YAML serialization/deserialization)
-- **defusedxml** (Safe XML parsing)
-- **pytest** & **httpx** (Automated testing suite)
-
----
-
-## Project Structure
-
 ```text
-omniconvert/
-├── README.md
-├── .gitignore
-├── frontend/
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── index.html
-│   ├── .env.example
-│   └── src/
-│       ├── main.tsx
-│       ├── App.tsx
-│       ├── components/
-│       │   ├── FileDropzone.tsx
-│       │   ├── FileCard.tsx
-│       │   ├── FormatSelector.tsx
-│       │   ├── ConversionProgress.tsx
-│       │   ├── ConversionResult.tsx
-│       │   └── ErrorMessage.tsx
-│       ├── pages/
-│       │   ├── HomePage.tsx
-│       │   ├── ToolsPage.tsx
-│       │   └── SettingsPage.tsx
-│       ├── services/
-│       │   └── conversionApi.ts
-│       ├── types/
-│       └── utils/
-├── backend/
-│   ├── requirements.txt
-│   ├── .env.example
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── config.py
-│   │   ├── api/
-│   │   │   ├── health.py
-│   │   │   ├── formats.py
-│   │   │   └── conversions.py
-│   │   ├── schemas/
-│   │   │   └── conversion.py
-│   │   ├── services/
-│   │   │   ├── conversion_registry.py
-│   │   │   ├── conversion_service.py
-│   │   │   ├── file_validation.py
-│   │   │   ├── file_storage.py
-│   │   │   └── cleanup_service.py
-│   │   └── converters/
-│   │       ├── images.py
-│   │       ├── pdf.py
-│   │       ├── documents.py
-│   │       ├── spreadsheets.py
-│   │       ├── text.py
-│   │       └── archives.py
-│   ├── tests/
-│   │   ├── test_images.py
-│   │   ├── test_text_data.py
-│   │   ├── test_spreadsheets.py
-│   │   ├── test_pdf.py
-│   │   └── test_api.py
-│   └── temp/
-└── scripts/
-    ├── setup.ps1
-    ├── setup.sh
-    ├── start.ps1
-    └── start.sh
+Browser UI (React 19 + Vite + Tailwind CSS)
+       │
+       ▼ (REST HTTP / Multipart Form)
+FastAPI Backend (Uvicorn / Python 3.12)
+       │
+       ├── Capabilities & Registry Discovery
+       │      ├── Image Engine (Pillow, pillow-heif)
+       │      ├── PDF Engine (PyMuPDF, pypdf, pypdfium2)
+       │      ├── Document & Data (openpyxl, PyYAML, defusedxml)
+       │      └── Native System CLI Adapters (LibreOffice, Pandoc, FFmpeg)
+       │
+       ▼
+Isolated Temporary Storage (`backend/temp/{uuid}`)
+       │
+       ▼
+Streaming File / Batch ZIP Download
 ```
 
----
+### Frontend Stack
+- **React 19** & **TypeScript** (Strict Mode)
+- **Vite** with `@vitejs/plugin-react`
+- **Tailwind CSS v4** & custom theme tokens
+- **Lucide React** (modern iconography)
+- **Service Worker** (`sw.js`) for PWA desktop installation
 
-## Supported Conversion Matrix
-
-| Category | Source Format | Target Formats | Engine / Dependencies | Notes |
-|----------|--------------|----------------|----------------------|-------|
-| **Images** | JPG/JPEG | PNG, WebP, BMP, TIFF, GIF, PDF, ICO | Pillow | Preserves RGB, allows quality parameter |
-| | PNG | JPG/JPEG, WebP, BMP, TIFF, GIF, PDF, ICO | Pillow | Alpha channel flattened to white on JPEG |
-| | WebP | PNG, JPG/JPEG, BMP, TIFF, PDF | Pillow | |
-| | BMP | PNG, JPG/JPEG, WebP, TIFF, PDF | Pillow | |
-| | TIFF | PNG, JPG/JPEG, WebP, BMP, PDF | Pillow | |
-| | GIF | PNG, JPG/JPEG, WebP | Pillow | Extracts frame/still |
-| **Data & Text** | TXT | MD, HTML, PDF | Python / pypdf | Text formatted to document |
-| | MD | HTML, TXT | Python (safe markdown) | Optional Pandoc for advanced render |
-| | HTML | TXT | Python / html parser | Extracts clean plain text |
-| | JSON | YAML, CSV | PyYAML, Python csv | Flattens list of dicts for CSV |
-| | YAML | JSON | PyYAML | Safe YAML parsing |
-| | XML | Formatted XML | defusedxml | Formats with indent, entity injection disabled |
-| | CSV | JSON, XLSX | Python csv, openpyxl | Converts tabular rows |
-| | XLSX | CSV, JSON, PDF | openpyxl, LibreOffice (PDF) | Extracts first sheet to CSV/JSON |
-| **PDF** | PDF | TXT | pypdf | Extracts readable text per page |
-| | PDF (Multiple) | PDF (Merged) | pypdf | Merges multiple files into one |
-| | PDF (Single) | PDF (Split/Rotated) | pypdf | Page extraction and rotation |
-| | DOCX | PDF, TXT | LibreOffice / Python | LibreOffice headless when installed |
+### Backend Stack
+- **FastAPI** + **Uvicorn**
+- **Pydantic v2** for type-safe validation schemas
+- **PyMuPDF (`fitz`)** for high-fidelity text-to-PDF generation
+- **pypdf** & **pypdfium2** for PDF rendering and manipulation
+- **Pillow** & **pillow-heif** for image operations
+- **openpyxl** for Excel workbook parsing
+- **PyYAML** & **defusedxml** for safe structured data
 
 ---
 
-## System Requirements & Dependencies
+## Local Development Quick Start
 
-### Core Requirements
-- **Node.js**: v18.0.0 or later (v22+ verified)
+### Prerequisites
+- **Node.js**: v18+ (v20+ recommended)
 - **Python**: 3.11 or 3.12
-
-### Optional Local Tools (Auto-detected)
-- **LibreOffice (`soffice`)**: Enables DOCX $\to$ PDF, XLSX $\to$ PDF, and ODT conversions.
-- **Pandoc (`pandoc`)**: Enables extended Markdown $\to$ PDF / DOCX conversions.
-- **FFmpeg (`ffmpeg`)**: Reserved for audio/video conversion module.
-
-If an optional tool is missing, OmniConvert automatically marks those conversions as disabled and informs the user with installation instructions.
-
----
-
-## Quick Start (Windows)
+- Optional: LibreOffice (`soffice`), Pandoc, or FFmpeg in your system `PATH`.
 
 ### 1. Backend Setup
-Open PowerShell in the project root:
-```powershell
+
+```bash
+# Navigate to backend
 cd backend
+
+# Create and activate virtual environment
+# Windows:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+# Linux / macOS:
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start backend server on port 8000
 python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ### 2. Frontend Setup
-In a new PowerShell terminal:
-```powershell
+
+In a separate terminal:
+
+```bash
+# Navigate to frontend
 cd frontend
+
+# Install packages
 npm install
+
+# Start Vite dev server
 npm run dev
 ```
-Open your browser at `http://localhost:5173`.
+
+Open your browser at **`http://localhost:5173`**.
 
 ---
 
-## Quick Start (Linux / macOS)
+## Running with Docker (Local or VPS)
 
-### 1. Backend Setup
+Build and run the unified single-container production image locally:
+
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-python3 -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# Build Docker image
+docker build -t omniconvert .
+
+# Run on port 8000
+docker run -p 8000:8000 omniconvert
 ```
 
-### 2. Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Access the app at `http://localhost:8000`.
 
 ---
 
 ## API Reference
 
-- `GET /api/v1/health`
-  - Returns backend health and list of detected optional tools (`libreoffice`, `pandoc`, `ffmpeg`).
-- `GET /api/v1/formats`
-  - Returns the list of supported input extensions and available output formats based on system capabilities.
-- `POST /api/v1/convert`
-  - Multipart form upload:
-    - `files`: One or more files.
-    - `target_format`: Extension string (e.g., `png`, `pdf`).
-    - `options`: Optional JSON string containing options (e.g. `{"quality": 85, "width": 800}`).
-  - Returns converted file directly or a ZIP file if multiple files converted.
-- `GET /api/v1/convert/{conversion_id}/download`
-  - Downloads previously processed files using temporary token.
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/v1/health` | `GET` | Health check returning status, version, and detected native tools |
+| `/api/v1/formats` | `GET` | Matrix of supported source $\to$ target formats based on installed tools |
+| `/api/v1/convert` | `POST` | Multipart upload for file conversions (single or batch) |
+| `/api/v1/convert/{id}/download` | `GET` | Download processed file or batch ZIP archive |
+| `/api/v1/pdf-studio/info` | `POST` | Inspects uploaded PDF and returns page count and dimensions |
+| `/api/v1/pdf-studio/render-page` | `POST` | Renders a specific PDF page to high-res JPG for studio preview |
+| `/api/v1/pdf-studio/export` | `POST` | Exports reordered, rotated, or filtered PDF |
 
 ---
 
-## Security & Privacy
+## Testing & Quality Assurance
 
-- **Localhost Binding**: Backend defaults to `127.0.0.1`.
-- **CORS Restricted**: Permitted only to frontend origins (`http://localhost:5173`, `http://127.0.0.1:5173`).
-- **Path Traversal Protection**: Filenames sanitized, converted inside unique UUID scratch directories.
-- **Size Limits**: 50MB per file default limit.
-- **No External Submissions**: Files are never relayed to external cloud services or LLMs.
-- **Periodic Cleanup**: Background cleaner purges orphaned temporary directories older than 30 minutes.
-
----
-
-## Production Hosting & Deployment
-
-OmniConvert is packaged for single-container production deployment using Docker. The multi-stage `Dockerfile` bundles the compiled React frontend, FastAPI backend, and all native Debian converter engines (`libreoffice-nogui`, `pandoc`, `poppler-utils`, `weasyprint`).
-
-### 1. Deploy with Docker Compose (Local or VPS)
+Run the automated backend test suite:
 
 ```bash
-# Clone and build
-git clone https://github.com/Akitha-Chanupama/OmniConvert.git
-cd OmniConvert
-
-# Start production container
-docker compose up -d --build
+cd backend
+.\.venv\Scripts\pytest -v
 ```
-The app will be live at `http://localhost:8000`.
 
-### 2. Deploy to Railway, Render, or Fly.io
+Run frontend typecheck and build validation:
 
-1. Create a new service from your GitHub repository.
-2. Select **Dockerfile** as the build source (root `Dockerfile`).
-3. Set Environment Variables:
-   - `APP_MODE=hosted`
-   - `PORT=8000` (Railway/Render automatically provides dynamic `$PORT`)
-   - `MAX_UPLOAD_SIZE_MB=50`
-   - `ALLOW_ALL_ORIGINS=true`
-4. Deploy! The single container serves both the web UI and the conversion API with automated background cleanup.
-
-### 3. Split Architecture (Vercel + Railway/Render)
-
-- **Frontend**: Deploy `frontend/` to Vercel or Netlify. Set `VITE_API_BASE_URL=https://your-api.railway.app`.
-- **Backend**: Deploy `backend/` using `backend/Dockerfile` to Railway/Render. Set `CORS_ORIGINS=https://your-frontend.vercel.app`.
+```bash
+cd frontend
+npm run build
+```
 
 ---
 
-## Troubleshooting & Limitations
+## License
 
-- **"LibreOffice not found"**: Ensure `soffice` is in your Windows `PATH` if you wish to convert DOCX to PDF.
-- **Large Excel sheets**: Converting very large workbooks to JSON or CSV may take a few seconds; conversion runs synchronously with streaming responses.
-- **PDF Scans**: PDF to TXT extracts native text streams only (OCR is not included in initial release).
-
----
-
-## Implementation Checklist
-
-- [x] **Phase 0: Workspace inspection and project skeleton**
-  - Inspected system runtimes (Node v22, Python 3.12 installed, Git 2.50).
-  - Created monorepo structure with `frontend/`, `backend/`, and `scripts/`.
-  - Configured root `.gitignore` and `README.md`.
-- [x] **Phase 1: Core FastAPI backend and React frontend**
-  - Implemented modular FastAPI application (`app/main.py`, config, API routes).
-  - Implemented `ImageConverter` (Pillow) with quality compression, resizing, and transparency preservation.
-  - Implemented `TextDataConverter` (TXT, Markdown, HTML, JSON, YAML, XML formatting, CSV).
-  - Built modern React + Vite + TypeScript frontend with drag-and-drop zone and dynamic formats.
-- [x] **Phase 2: PDF, office documents, and structured text converters**
-  - Implemented `PDFConverter` (vector text generation from TXT, text extraction, merge, rotation, page ranges).
-  - Implemented `SpreadsheetConverter` (CSV <-> XLSX, XLSX -> JSON with `openpyxl`).
-  - Implemented `DocumentConverter` with native XML text extraction for DOCX and safe LibreOffice headless subprocess.
-- [x] **Phase 3: Batch processing, ZIP packaging, and settings**
-  - Implemented `ArchiveService` for batch multi-file packaging into `.zip`.
-  - Implemented `ConversionSettings` component with contextual quality, resizing, rotation, and sheet options.
-  - Implemented `SettingsPage` with real-time tool detection and system diagnostics.
-  - Added session history with one-click re-downloads.
-- [x] **Phase 4: Automated test suite verification & production build validation**
-  - 21 automated backend tests passed (`pytest` 21/21 passed).
-  - Production TypeScript & Vite bundle built with 0 errors (`npm run build`).
-  - Live API verified with real conversion payloads on `127.0.0.1:8000`.
-
+Distributed under the **MIT License**. See `LICENSE` for details.
