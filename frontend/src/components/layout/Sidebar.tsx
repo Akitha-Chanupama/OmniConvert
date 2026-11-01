@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  ArrowLeftRight,
   LayoutDashboard,
   Image as ImageIcon,
   FileText,
@@ -134,8 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className="flex items-center space-x-3 cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all">
-              <ArrowLeftRight className="w-5 h-5 drop-shadow-xs" />
+            <div className="w-10 h-10 rounded-2xl bg-[#0c1427] text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all overflow-hidden shrink-0">
+              <img src="/logo.png" alt="OmniConvert Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="flex items-center space-x-2">

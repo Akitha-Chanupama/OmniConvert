@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { UploadCloud, FileText, Image as ImageIcon, Layers, FileSpreadsheet, FileCode, X } from 'lucide-react';
+import { FileText, Image as ImageIcon, Layers, FileSpreadsheet, FileCode, X } from 'lucide-react';
 
 interface GlobalDropOverlayProps {
   onFilesDropped: (files: File[]) => void;
@@ -140,8 +140,8 @@ export const GlobalDropOverlay: React.FC<GlobalDropOverlayProps> = ({
 
         {/* Central Icon Emblem */}
         <div className="relative mb-6">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-2xl shadow-blue-500/50 ring-8 ring-blue-500/20 transform hover:scale-105 transition-transform duration-300">
-            <UploadCloud className="w-12 h-12 sm:w-14 sm:h-14 animate-bounce" />
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#0c1427] text-white flex items-center justify-center shadow-2xl shadow-blue-500/50 ring-8 ring-blue-500/20 transform hover:scale-105 transition-transform duration-300 overflow-hidden">
+            <img src="/logo.png" alt="OmniConvert" className="w-full h-full object-cover animate-pulse select-none" />
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { UploadCloud, FileUp } from 'lucide-react';
+import { FileUp } from 'lucide-react';
 
 interface FileDropzoneProps {
   onFilesSelected: (files: File[]) => void;
@@ -67,16 +67,20 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
         {/* Centered Rich Multi-Layered Icon Emblem */}
         <div className="relative">
           <div
-            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center transition-all duration-300 shadow-xl ${
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center transition-all duration-300 shadow-xl overflow-hidden ${
               isDragOver
                 ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white scale-110 shadow-blue-500/40 ring-8 ring-blue-500/20'
                 : 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-blue-500/25 ring-4 ring-blue-500/10 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-blue-500/40 group-hover:ring-8 group-hover:ring-blue-500/20'
             }`}
           >
             {isDragOver ? (
-              <FileUp className="w-10 h-10 sm:w-11 sm:h-11 animate-bounce" />
+              <FileUp className="w-10 h-10 sm:w-11 sm:h-11 animate-bounce text-white" />
             ) : (
-              <UploadCloud className="w-10 h-10 sm:w-11 sm:h-11" />
+              <img
+                src="/logo.png"
+                alt="OmniConvert Logo"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 select-none"
+              />
             )}
           </div>
         </div>
