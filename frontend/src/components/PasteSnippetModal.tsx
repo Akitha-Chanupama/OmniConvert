@@ -4,7 +4,6 @@ import {
   FileCode2,
   FileText,
   FileSpreadsheet,
-  Sparkles,
   ArrowRight,
   Code2,
 } from 'lucide-react';
@@ -156,7 +155,7 @@ export const PasteSnippetModal: React.FC<PasteSnippetModalProps> = ({
         <div className="p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-slate-900/40">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
-              <Sparkles className="w-5 h-5" />
+              <FileText className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">
@@ -262,7 +261,7 @@ export const PasteSnippetModal: React.FC<PasteSnippetModalProps> = ({
                 onClick={handleFormatJson}
                 className="absolute right-3 top-3 px-2 py-1 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-blue-600 dark:text-blue-400 rounded-lg shadow-2xs backdrop-blur-xs cursor-pointer flex items-center space-x-1"
               >
-                <Sparkles className="w-3 h-3" />
+                <Code2 className="w-3 h-3" />
                 <span>Prettify JSON</span>
               </button>
             )}

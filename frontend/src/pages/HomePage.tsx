@@ -28,7 +28,7 @@ import { getFileExtension, formatBytes } from '../utils/formatters';
 import { getSettings, subscribeSettings } from '../utils/settingsStore';
 import { playSuccessChime, playErrorChime } from '../utils/soundEffects';
 import { addStoredHistory } from '../utils/historyStore';
-import { Sparkles } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface HomePageProps {
   onNavigateToTools?: () => void;
@@ -533,7 +533,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   onClick={onOpenPasteSnippet}
                   className="flex items-center space-x-2 px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all border border-slate-200/80 dark:border-slate-700/80 shadow-2xs hover:scale-[1.02] cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                  <FileText className="w-3.5 h-3.5 text-blue-500" />
                   <span>Or paste raw text, Markdown, or JSON directly</span>
                 </button>
               </div>

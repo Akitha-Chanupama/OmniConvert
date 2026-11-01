@@ -3,7 +3,7 @@ import {
   Settings,
   ArrowRight,
   Loader2,
-  Sparkles,
+  TrendingDown,
 } from 'lucide-react';
 import { formatBytes } from '../utils/formatters';
 import type { ConversionOptions } from '../types';
@@ -237,7 +237,7 @@ export const ConversionSettings: React.FC<ConversionSettingsProps> = ({
           {estimatedOutput && totalRawSizeBytes > 0 && (
             <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 shadow-2xs">
               <div className="flex items-center space-x-1.5 font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <TrendingDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Est. Output: ~{formatBytes(estimatedOutput.estimated)}</span>
               </div>
               <span className="font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-200/70 dark:bg-emerald-900/60 text-[10px] text-emerald-800 dark:text-emerald-200">
