@@ -90,3 +90,12 @@ async def test_download_nonexistent_returns_404():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         res = await client.get("/api/v1/convert/fake-uuid-not-found/download")
         assert res.status_code == 404
+
+@pytest.mark.asyncio
+async def test_root_or_spa_serving():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        res = await client.get("/")
+        assert res.status_code == 200
+        # Either serves compiled HTML SPA or JSON API welcome payload
+        assert "text/html" in res.headers.get("content-type", "") or "application/json" in res.headers.get("content-type", "")

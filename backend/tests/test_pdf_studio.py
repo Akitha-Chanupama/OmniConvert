@@ -107,3 +107,13 @@ def test_compile_pdf_to_images_zip(sample_pdf: Path):
     dl_res = client.get(comp_data["download_url"])
     assert dl_res.status_code == 200
     assert dl_res.headers["content-type"] == "application/zip"
+
+def test_inspect_pdf_oversized_rejected(monkeypatch):
+    from app.config import config
+    monkeypatch.setattr(config, "MAX_UPLOAD_SIZE_MB", 0)
+    response = client.post(
+        "/api/v1/pdf-studio/inspect",
+        files={"file": ("sample.pdf", b"%PDF-1.4 oversized simulated file", "application/pdf")},
+    )
+    assert response.status_code == 413
+    assert "exceeds maximum allowed limit" in response.json()["detail"]

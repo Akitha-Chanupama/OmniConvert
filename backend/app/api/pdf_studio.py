@@ -4,6 +4,7 @@ from app.schemas.pdf_studio import (
     PdfCompileResponse,
     PdfInspectResponse,
 )
+from app.services.file_validation import FileValidator
 from app.services.pdf_studio_service import pdf_studio_service
 
 router = APIRouter(prefix="/pdf-studio", tags=["PDF Studio"])
@@ -26,6 +27,14 @@ async def inspect_pdf(file: UploadFile = File(...)):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Uploaded file is empty.",
+            )
+
+        try:
+            FileValidator.validate_size(len(content))
+        except ValueError as ve:
+            raise HTTPException(
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                detail=str(ve),
             )
 
         return pdf_studio_service.inspect_pdf(content, file.filename)
