@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,14 +26,24 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Configuration - restricted to local development origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=config.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
-)
+# CORS Configuration - supports local development and hosted deployments
+cors_origins = config.cors_origins
+if "*" in cors_origins or os.getenv("ALLOW_ALL_ORIGINS", "").lower() in ("true", "1"):
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r".*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["*"],
+    )
 
 # Include API Routers under /api/v1
 app.include_router(health_router, prefix="/api/v1")
@@ -45,7 +56,7 @@ async def root():
     return {
         "app": "OmniConvert API",
         "status": "online",
-        "mode": "local",
+        "mode": config.MODE,
         "docs_url": "/docs",
         "endpoints": {
             "health": "/api/v1/health",

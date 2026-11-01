@@ -73,7 +73,7 @@ export const SettingsPage: React.FC = () => {
               <div>
                 <span>Backend Core Service</span>
                 <p className="text-xs font-normal text-slate-500 dark:text-slate-400">
-                  FastAPI engine running as a local headless daemon
+                  FastAPI core engine processing conversion pipelines
                 </p>
               </div>
             </div>
@@ -94,13 +94,13 @@ export const SettingsPage: React.FC = () => {
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <span className="text-slate-400 dark:text-slate-400 block mb-1">Execution Mode</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200 uppercase">
-                  {health?.mode || 'Personal Localhost'}
+                  {health?.mode ? health.mode.toUpperCase() : 'ACTIVE'}
                 </span>
               </div>
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-400 dark:text-slate-400 block mb-1">Host Binding</span>
-                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
-                  127.0.0.1:8000
+                <span className="text-slate-400 dark:text-slate-400 block mb-1">API Endpoint</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200 text-xs truncate block" title={import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'Connected')}>
+                  {import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'Connected')}
                 </span>
               </div>
             </div>
@@ -237,10 +237,10 @@ export const SettingsPage: React.FC = () => {
               <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-1">
                 <span className="font-bold text-xs text-slate-900 dark:text-slate-200 flex items-center space-x-1.5">
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>100% Localhost Only</span>
+                  <span>Ephemeral Storage Guarantee</span>
                 </span>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  FastAPI binds strictly to <code>127.0.0.1</code>, making it completely invisible outside your machine.
+                  All uploaded files and temporary workspaces are automatically wiped after conversion and never permanently retained.
                 </p>
               </div>
             </div>

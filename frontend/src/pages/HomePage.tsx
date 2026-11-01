@@ -89,7 +89,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       .catch((err) => {
         if (isMounted) {
           setApiError(
-            `Could not connect to local backend API: ${err.message}. Ensure backend is running on 127.0.0.1:8000.`
+            `Could not connect to conversion backend API: ${err.message}. Please verify the backend service is running and accessible.`
           );
         }
       });

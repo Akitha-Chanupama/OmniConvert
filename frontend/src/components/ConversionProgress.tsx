@@ -14,9 +14,9 @@ export const ConversionProgress: React.FC<ConversionProgressProps> = ({
         <Loader2 className="w-10 h-10 text-slate-800 animate-spin" />
       </div>
       <div>
-        <h3 className="text-base font-semibold text-slate-800">{statusMessage}</h3>
-        <p className="text-xs text-slate-500 mt-1">
-          Processing on 127.0.0.1 • Fast local conversion engine
+        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">{statusMessage}</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Processing securely • Fast high-performance conversion engine
         </p>
       </div>
     </div>
