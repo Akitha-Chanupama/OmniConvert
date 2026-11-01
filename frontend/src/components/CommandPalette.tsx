@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   CornerDownLeft,
   X,
-  Sparkles,
   History,
   Download,
 } from 'lucide-react';
@@ -169,7 +168,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         title: 'Paste Raw Text or Code',
         subtitle: 'Convert Markdown, JSON, or text directly to PDF/CSV',
         category: 'Actions',
-        icon: Sparkles,
+        icon: FileText,
         accentColor: 'text-blue-500',
         shortcut: 'P',
         onSelect: () => {
