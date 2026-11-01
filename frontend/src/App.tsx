@@ -236,9 +236,10 @@ export const App: React.FC = () => {
                 </a>
               </div>
               <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
-              <p className="text-slate-400 dark:text-slate-500 text-[11px] font-medium">
-                OmniConvert v1.0
-              </p>
+              <div className="flex items-center space-x-1.5 text-slate-400 dark:text-slate-500 text-[11px] font-medium">
+                <img src="/logo.png" alt="" className="w-3.5 h-3.5 rounded-sm object-cover" />
+                <span>OmniConvert v1.0</span>
+              </div>
             </div>
           </div>
         </footer>
