@@ -12,7 +12,7 @@ export const HeroBanner: React.FC = () => {
           </span>
         </div>
 
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-[52px] font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
+        <h1 className="font-display text-3xl sm:text-5xl lg:text-[52px] font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
           Convert files. <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">Keep it simple.</span>
         </h1>
 
@@ -22,9 +22,9 @@ export const HeroBanner: React.FC = () => {
       </div>
 
       {/* 3 Rich Value Proposition Cards */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full lg:w-auto">
         {/* 100% Local */}
-        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200">
+        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200 w-full">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-teal-500/10 to-transparent text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shadow-xs shadow-emerald-500/15 flex items-center justify-center shrink-0">
             <Shield className="w-5 h-5" />
           </div>
@@ -35,7 +35,7 @@ export const HeroBanner: React.FC = () => {
         </div>
 
         {/* Fast & Reliable */}
-        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200">
+        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200 w-full">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500/20 via-purple-500/10 to-transparent text-violet-600 dark:text-violet-400 border border-violet-500/30 shadow-xs shadow-violet-500/15 flex items-center justify-center shrink-0">
             <Zap className="w-5 h-5 fill-violet-500/20" />
           </div>
@@ -46,7 +46,7 @@ export const HeroBanner: React.FC = () => {
         </div>
 
         {/* Secure */}
-        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200">
+        <div className="flex items-center space-x-3.5 px-4.5 py-3.5 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-xs backdrop-blur-sm transition-transform hover:-translate-y-0.5 duration-200 w-full">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500/20 via-indigo-500/10 to-transparent text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-xs shadow-blue-500/15 flex items-center justify-center shrink-0">
             <Lock className="w-5 h-5" />
           </div>

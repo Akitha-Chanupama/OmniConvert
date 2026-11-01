@@ -64,9 +64,9 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
           const pct = hasSavings && orig.size > 0 ? Math.round((diff / orig.size) * 100) : 0;
 
           return (
-            <div key={idx} className="flex items-center justify-between p-3.5 sm:p-4 text-xs sm:text-sm">
-              <div className="min-w-0 pr-4">
-                <div className="flex items-center space-x-2">
+            <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 text-xs sm:text-sm gap-2.5">
+              <div className="min-w-0 pr-2">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <p className="font-semibold text-slate-800 dark:text-slate-200 truncate" title={item.converted_filename}>
                     {item.converted_filename}
                   </p>
@@ -88,43 +88,46 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
                   {orig && ` (${formatBytes(orig.size)})`}
                 </p>
               </div>
-              <div className="flex items-center space-x-2 shrink-0">
-                {canCopy && (
-                  <button
-                    type="button"
-                    onClick={() => handleCopyItem(item)}
-                    className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
-                    title="Copy text content to clipboard"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                )}
+              <div className="flex items-center justify-between sm:justify-end space-x-2 shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
+                <div className="flex items-center space-x-1.5">
+                  {canCopy && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopyItem(item)}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+                      title="Copy text content to clipboard"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
 
-                {onPreview && (
-                  <button
-                    data-testid="conversion-preview-btn"
-                    type="button"
-                    onClick={() => onPreview(item)}
-                    className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                    <span>Preview</span>
-                  </button>
-                )}
+                  {onPreview && (
+                    <button
+                      data-testid="conversion-preview-btn"
+                      type="button"
+                      onClick={() => onPreview(item)}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl inline-flex items-center space-x-1.5 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                      <span>Preview</span>
+                    </button>
+                  )}
+                </div>
+
                 <a
                   href={ConversionApi.getFullDownloadUrl(item.download_url)}
                   download={item.converted_filename}
-                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl inline-flex items-center space-x-1.5 transition-colors shadow-2xs"
+                  className="px-3 sm:px-3.5 py-1.5 text-xs font-bold text-white bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-xl inline-flex items-center space-x-1.5 transition-colors shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download</span>

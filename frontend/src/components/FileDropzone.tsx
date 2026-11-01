@@ -46,7 +46,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={() => !disabled && fileInputRef.current?.click()}
-      className={`group relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all duration-300 cursor-pointer select-none overflow-hidden ${
+      className={`group relative border-2 border-dashed rounded-3xl p-5 py-7 sm:p-12 text-center transition-all duration-300 cursor-pointer select-none overflow-hidden ${
         disabled
           ? 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 opacity-60 cursor-not-allowed'
           : isDragOver
@@ -63,18 +63,18 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
         disabled={disabled}
       />
 
-      <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-3.5 sm:space-y-4">
         {/* Centered Rich Multi-Layered Icon Emblem */}
         <div className="relative">
           <div
-            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center transition-all duration-300 shadow-xl overflow-hidden ${
+            className={`w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-xl overflow-hidden ${
               isDragOver
                 ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white scale-110 shadow-blue-500/40 ring-8 ring-blue-500/20'
                 : 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-blue-500/25 ring-4 ring-blue-500/10 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-blue-500/40 group-hover:ring-8 group-hover:ring-blue-500/20'
             }`}
           >
             {isDragOver ? (
-              <FileUp className="w-10 h-10 sm:w-11 sm:h-11 animate-bounce text-white" />
+              <FileUp className="w-8 h-8 sm:w-11 sm:h-11 animate-bounce text-white" />
             ) : (
               <img
                 src="/logo.png"
@@ -85,8 +85,8 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
           </div>
         </div>
 
-        <div className="space-y-2 max-w-md">
-          <p className="font-display text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <div className="space-y-1.5 sm:space-y-2 max-w-md px-2">
+          <p className="font-display text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             {isDragOver ? (
               'Drop files to upload instantly'
             ) : (
@@ -98,25 +98,28 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({ onFilesSelected, dis
               </>
             )}
           </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Supports multiple files. Press{' '}
-            <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
-              Ctrl
-            </kbd>{' '}
-            +{' '}
-            <kbd className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
-              V
-            </kbd>{' '}
-            to paste from clipboard.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-normal">
+            Supports batch files & auto-format detection.{' '}
+            <span className="hidden sm:inline">
+              Press{' '}
+              <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+                Ctrl
+              </kbd>{' '}
+              +{' '}
+              <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+                V
+              </kbd>{' '}
+              to paste.
+            </span>
           </p>
         </div>
 
         {/* Supported Format Pills */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-2 font-display text-xs font-bold text-slate-700 dark:text-slate-300">
+        <div className="pt-1 sm:pt-2 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 font-display text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-300">
           {['JPG', 'PNG', 'WEBP', 'PDF', 'DOCX', 'XLSX', 'CSV', 'JSON', 'MD'].map((fmt) => (
             <span
               key={fmt}
-              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs transition-transform hover:scale-105"
+              className="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs transition-transform hover:scale-105"
             >
               {fmt}
             </span>

@@ -120,32 +120,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 sm:w-72 bg-[#0c1427] text-slate-300 flex flex-col border-r border-[#1a233a] transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-72 max-w-[85vw] bg-[#0c1427] text-slate-300 flex flex-col border-r border-[#1a233a] transition-transform duration-300 ease-in-out overflow-hidden lg:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-20 px-6 flex items-center justify-between border-b border-[#1a233a] shrink-0">
+        <div className="h-18 sm:h-20 px-4 sm:px-5 flex items-center justify-between border-b border-[#1a233a] shrink-0">
           <div
             onClick={() => {
               onSelectDashboard();
               onCloseMobile();
             }}
-            className="flex items-center space-x-3 cursor-pointer group select-none"
+            className="flex items-center space-x-2.5 cursor-pointer group select-none min-w-0 flex-1 mr-2"
           >
-            <div className="w-10 h-10 rounded-2xl bg-[#0c1427] text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all overflow-hidden shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#0c1427] text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all overflow-hidden shrink-0">
               <img src="/logo.png" alt="OmniConvert Logo" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-display font-extrabold text-xl text-white tracking-tight">
+            <div className="min-w-0">
+              <div className="flex items-center space-x-1.5">
+                <span className="font-display font-extrabold text-lg sm:text-xl text-white tracking-tight truncate">
                   OmniConvert
                 </span>
-                <span className="font-display px-2 py-0.5 text-[10px] font-black rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                <span className="font-display px-1.5 py-0.5 text-[9px] sm:text-[10px] font-black rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30 shrink-0">
                   v1.0
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium">Personal Local File Suite</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 font-medium truncate">Personal Local File Suite</p>
             </div>
           </div>
 
@@ -153,7 +153,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={onCloseMobile}
-            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 cursor-pointer"
+            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 active:bg-white/15 cursor-pointer shrink-0"
+            aria-label="Close navigation menu"
           >
             <X className="w-5 h-5" />
           </button>

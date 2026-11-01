@@ -87,7 +87,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-4">
+    <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-3.5 sm:space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center space-x-3">
@@ -117,7 +117,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       </div>
 
       {/* Action Buttons 3-Column Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {actions.map((act) => {
           const Icon = act.icon;
           return (
@@ -131,13 +131,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
                   onSelectAction(act.source, act.target);
                 }
               }}
-              className="group relative flex items-center justify-between p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700/60 ring-1 ring-black/[0.02] dark:ring-white/[0.04] hover:shadow-md transition-all cursor-pointer text-left overflow-hidden"
+              className="group relative flex items-center justify-between p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700/60 ring-1 ring-black/[0.02] dark:ring-white/[0.04] hover:shadow-md transition-all cursor-pointer text-left overflow-hidden active:scale-[0.99]"
             >
-              <div className="flex items-center space-x-3.5 min-w-0 flex-1">
+              <div className="flex items-center space-x-3 sm:space-x-3.5 min-w-0 flex-1">
                 <div
-                  className={`w-11 h-11 rounded-2xl ${act.bgColor} ${act.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-108 duration-200`}
+                  className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl ${act.bgColor} ${act.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-108 duration-200`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center space-x-1.5">
