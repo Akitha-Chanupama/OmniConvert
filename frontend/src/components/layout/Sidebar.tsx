@@ -160,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Scrollable Navigation Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 custom-scrollbar scroll-smooth">
           {/* Main Dashboard item */}
           <div>
             <button

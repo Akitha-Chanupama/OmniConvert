@@ -292,7 +292,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Command Items List */}
         <div
           ref={listRef}
-          className="flex-1 overflow-y-auto p-2 sm:p-3 divide-y divide-slate-100/60 dark:divide-slate-800/60"
+          className="flex-1 overflow-y-auto p-2 sm:p-3 divide-y divide-slate-100/60 dark:divide-slate-800/60 custom-scrollbar overscroll-contain scroll-smooth"
         >
           {filteredCommands.length === 0 ? (
             <div className="py-12 text-center text-slate-400 dark:text-slate-500">
