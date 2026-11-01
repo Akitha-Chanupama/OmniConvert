@@ -26,7 +26,7 @@ async def check_health():
     return HealthResponse(
         status="ok",
         version="1.0.0",
-        mode="local",
+        mode=config.MODE,
         installed_tools={
             "pillow": True,
             "pillow_heif": has_heif,

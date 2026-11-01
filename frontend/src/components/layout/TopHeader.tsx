@@ -73,8 +73,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Live Engine Status Badge */}
         <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/70 rounded-full text-xs font-semibold font-display font-bold text-emerald-700 dark:text-emerald-400 shadow-2xs ring-1 ring-emerald-500/10">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="hidden sm:inline">Local Engine (127.0.0.1:8000)</span>
-          <span className="sm:hidden">127.0.0.1:8000</span>
+          <span className="hidden sm:inline">Conversion Engine Active</span>
+          <span className="sm:hidden">Engine Active</span>
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
         </div>
       </div>
