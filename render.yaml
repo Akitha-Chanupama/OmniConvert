@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: omniconvert
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_MODE
+        value: hosted
+      - key: ALLOW_ALL_ORIGINS
+        value: "true"
+      - key: MAX_FILE_SIZE_MB
+        value: "50"
