@@ -481,7 +481,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   )}
                 </div>
 
-                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar overscroll-contain scroll-smooth">
                   {files.map((item, idx) => (
                     <FileCard
                       key={item.id}
@@ -559,7 +559,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </button>
               </div>
 
-              <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs max-h-60 overflow-y-auto">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs max-h-60 overflow-y-auto custom-scrollbar overscroll-contain scroll-smooth">
                 {history.map((item) => (
                   <div key={item.id} className="py-2.5 flex items-center justify-between">
                     <div className="min-w-0 pr-3">
