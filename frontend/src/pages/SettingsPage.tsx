@@ -69,14 +69,19 @@ export const SettingsPage: React.FC = () => {
     return unsubscribe;
   }, []);
 
-  const handleUpdate = (partial: Partial<AppSettings>, message?: string) => {
-    saveSettings(partial);
+  const handleUpdate = (
+    partial: Partial<AppSettings>,
+    message?: string,
+    origin?: { x?: number; y?: number }
+  ) => {
+    saveSettings(partial, origin);
     if (message) showNotification(message);
   };
 
-  const handleResetAll = () => {
+  const handleResetAll = (e?: React.MouseEvent) => {
     if (window.confirm('Are you sure you want to restore all settings and preferences to default?')) {
-      resetSettings();
+      const origin = e ? { x: e.clientX, y: e.clientY } : undefined;
+      resetSettings(origin);
       showNotification('All preferences restored to default.');
     }
   };
@@ -192,7 +197,13 @@ export const SettingsPage: React.FC = () => {
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => handleUpdate({ theme: t.id }, `Theme updated to ${t.label}.`)}
+                    onClick={(e) =>
+                      handleUpdate(
+                        { theme: t.id },
+                        `Theme updated to ${t.label}.`,
+                        { x: e.clientX, y: e.clientY }
+                      )
+                    }
                     className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative overflow-hidden group ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50/60 dark:bg-blue-950/40 shadow-xs ring-2 ring-blue-500/20'
