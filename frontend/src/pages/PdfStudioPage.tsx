@@ -23,6 +23,7 @@ import {
 import { ConversionApi } from '../services/conversionApi';
 import type { PdfPageThumbnailItem, PdfInspectResponse, PdfCompileResponse } from '../types';
 import { formatBytes } from '../utils/formatters';
+import { getSettings } from '../utils/settingsStore';
 
 interface PdfStudioPageProps {
   initialFile?: File | null;
@@ -209,6 +210,19 @@ export const PdfStudioPage: React.FC<PdfStudioPageProps> = ({
 
       const res = await ConversionApi.compilePdf(sessionId, file.name, pageSpecs, exportType);
       setCompileResult(res);
+
+      if (getSettings().autoDownload && res.download_url) {
+        try {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = res.download_url;
+          downloadLink.setAttribute('download', '');
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        } catch (e) {
+          console.warn('Auto-download was blocked or failed:', e);
+        }
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to export PDF.');
     } finally {
