@@ -11,7 +11,8 @@ This plan covers the implementation of the 5 requested enhancement features:
 
 ## Architecture & Component Breakdown
 
-### 1. Instant "Paste Raw Text / Code" Tool (`frontend/src/components/PasteSnippetModal.tsx`)
+### 1. Instant "Paste Raw Text / Code" T
+ool (`frontend/src/components/PasteSnippetModal.tsx`)
 - Modal with syntax/mode tabs: **Markdown**, **JSON**, **Plain Text / Code**, **CSV**.
 - Input features:
   - Textarea with character / word count and auto-formatting ("Prettify JSON" / "Clear").

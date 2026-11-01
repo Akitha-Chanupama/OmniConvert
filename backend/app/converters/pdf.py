@@ -51,86 +51,47 @@ class PDFConverter(BaseConverter):
         }
 
     def convert_txt_to_pdf(self, input_path: Path, output_path: Path) -> Path:
-        """Converts plain text file to searchable vector PDF with auto-pagination."""
+        """Converts plain text file to searchable vector PDF with clean auto-pagination using PyMuPDF Story."""
         with open(input_path, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
+            content = f.read()
 
-        writer = PdfWriter()
-        page_width = 612   # Standard Letter
-        page_height = 792
-        margin_left = 54
-        margin_top = 54
-        line_height = 14
-        lines_per_page = int((page_height - margin_top * 2) / line_height)
-
-        # Split long lines so they wrap cleanly
-        wrapped_lines: List[str] = []
-        max_chars_per_line = 80
-        for line in lines:
-            line_str = line.rstrip("\r\n")
-            if not line_str:
-                wrapped_lines.append("")
-                continue
-            while len(line_str) > max_chars_per_line:
-                split_idx = line_str.rfind(" ", 0, max_chars_per_line)
-                if split_idx == -1:
-                    split_idx = max_chars_per_line
-                wrapped_lines.append(line_str[:split_idx])
-                line_str = line_str[split_idx:].lstrip()
-            wrapped_lines.append(line_str)
-
-        # Chunk into pages
-        if not wrapped_lines:
-            wrapped_lines = [""]
-
-        page_chunks = [
-            wrapped_lines[i : i + lines_per_page]
-            for i in range(0, len(wrapped_lines), lines_per_page)
-        ]
-
-        for chunk in page_chunks:
-            page = writer.add_blank_page(width=page_width, height=page_height)
-            stream_commands = ["BT", "/F1 10 Tf", f"{line_height} TL"]
-            start_y = page_height - margin_top
-            stream_commands.append(f"{margin_left} {start_y} Td")
-
-            is_first = True
-            for l in chunk:
-                # Escape parentheses and backslashes for PDF string literal
-                escaped = l.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
-                # Filter out characters outside ascii printable for standard Type1 Helvetica
-                safe_ascii = "".join(c if 32 <= ord(c) < 127 else "?" for c in escaped)
-                if is_first:
-                    stream_commands.append(f"({safe_ascii}) Tj")
-                    is_first = False
-                else:
-                    stream_commands.append(f"T* ({safe_ascii}) Tj")
-
-            stream_commands.append("ET")
-            stream_content = "\n".join(stream_commands).encode("latin-1", errors="replace")
-
-            # Add Font dictionary to page resources
-            font_dict = DictionaryObject({
-                NameObject("/Type"): NameObject("/Font"),
-                NameObject("/Subtype"): NameObject("/Type1"),
-                NameObject("/BaseFont"): NameObject("/Helvetica"),
-            })
-            if "/Resources" not in page:
-                page[NameObject("/Resources")] = DictionaryObject()
-            if "/Font" not in page["/Resources"]:
-                page["/Resources"][NameObject("/Font")] = DictionaryObject()
-            page["/Resources"]["/Font"][NameObject("/F1")] = font_dict
-
-            # Create stream object
-            content_stream = DecodedStreamObject()
-            content_stream.set_data(stream_content)
-            page[NameObject("/Contents")] = content_stream
+        import html
+        styled_html = f"""
+        <style>
+        body {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.5; color: #1e293b; margin: 0; }}
+        pre {{ font-family: Courier, monospace; font-size: 9.5pt; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; margin: 0; }}
+        </style>
+        <pre>{html.escape(content)}</pre>
+        """
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "wb") as f_out:
-            writer.write(f_out)
 
-        return output_path
+        try:
+            import pymupdf
+            doc_writer = pymupdf.DocumentWriter(str(output_path))
+            story = pymupdf.Story(html=styled_html)
+            page_rect = pymupdf.Rect(0, 0, 612, 792)  # Standard Letter
+            story_rect = pymupdf.Rect(54, 54, 558, 738)  # 0.75in margins
+            more = 1
+            page_count = 0
+            while more and page_count < 500:
+                dev = doc_writer.begin_page(page_rect)
+                more, _ = story.place(story_rect)
+                story.draw(dev)
+                doc_writer.end_page()
+                page_count += 1
+            doc_writer.close()
+            return output_path
+        except Exception:
+            # Fallback to direct PyMuPDF page textbox insertion
+            import pymupdf
+            doc = pymupdf.open()
+            page = doc.new_page(width=612, height=792)
+            rect = pymupdf.Rect(54, 54, 558, 738)
+            page.insert_textbox(rect, content, fontsize=10, fontname="helv", color=(0.1, 0.15, 0.2))
+            doc.save(str(output_path))
+            doc.close()
+            return output_path
 
     def convert_md_to_pdf(
         self,
