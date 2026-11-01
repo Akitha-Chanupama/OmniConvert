@@ -37,7 +37,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'image',
     title: 'IMAGE CONVERSION',
     icon: ImageIcon,
-    accentColor: 'text-rose-400',
+    accentColor: 'text-rose-500 dark:text-rose-400',
     dotBg: 'bg-rose-500',
     tools: [
       { id: 'jpg-to-png', label: 'JPG to PNG', source: 'JPG', target: 'PNG' },
@@ -50,7 +50,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'pdf',
     title: 'PDF TOOLS',
     icon: Layers,
-    accentColor: 'text-violet-400',
+    accentColor: 'text-violet-600 dark:text-violet-400',
     dotBg: 'bg-violet-500',
     tools: [
       { id: 'pdf-studio', label: 'PDF Visual Studio', source: 'PDF', target: 'STUDIO', isStudio: true },
@@ -65,7 +65,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'document',
     title: 'DOCUMENT CONVERTER',
     icon: FileText,
-    accentColor: 'text-indigo-400',
+    accentColor: 'text-indigo-600 dark:text-indigo-400',
     dotBg: 'bg-indigo-500',
     tools: [
       { id: 'md-to-pdf', label: 'MD to PDF', source: 'MD', target: 'PDF' },
@@ -78,7 +78,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'spreadsheet',
     title: 'SPREADSHEET CONVERTER',
     icon: FileSpreadsheet,
-    accentColor: 'text-emerald-400',
+    accentColor: 'text-emerald-600 dark:text-emerald-400',
     dotBg: 'bg-emerald-500',
     tools: [
       { id: 'xlsx-to-csv', label: 'XLSX to CSV', source: 'XLSX', target: 'CSV' },
@@ -89,7 +89,7 @@ export const SIDEBAR_TOOL_GROUPS = [
     category: 'data',
     title: 'DATA CONVERTER',
     icon: FileCode,
-    accentColor: 'text-amber-400',
+    accentColor: 'text-amber-600 dark:text-amber-400',
     dotBg: 'bg-amber-500',
     tools: [
       { id: 'json-to-csv', label: 'JSON to CSV', source: 'JSON', target: 'CSV' },
@@ -120,12 +120,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-72 max-w-[85vw] bg-[#0c1427] text-slate-300 flex flex-col border-r border-[#1a233a] transition-transform duration-300 ease-in-out overflow-hidden lg:translate-x-0 ${
-          isOpenMobile ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-72 max-w-[85vw] bg-white dark:bg-[#0c1427] text-slate-700 dark:text-slate-300 flex flex-col border-r border-slate-200/90 dark:border-[#1a233a] transition-transform duration-300 ease-in-out overflow-hidden lg:translate-x-0 ${
+          isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-18 sm:h-20 px-4 sm:px-5 flex items-center justify-between border-b border-[#1a233a] shrink-0">
+        <div className="h-18 sm:h-20 px-4 sm:px-5 flex items-center justify-between border-b border-slate-200/80 dark:border-[#1a233a] shrink-0 bg-white/70 dark:bg-transparent">
           <div
             onClick={() => {
               onSelectDashboard();
@@ -133,19 +133,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className="flex items-center space-x-2.5 cursor-pointer group select-none min-w-0 flex-1 mr-2"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#0c1427] text-white flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/40 transition-all overflow-hidden shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-100 dark:bg-[#0c1427] text-white flex items-center justify-center shadow-md shadow-blue-500/15 dark:shadow-blue-500/25 ring-1 ring-black/5 dark:ring-white/20 group-hover:scale-105 group-hover:shadow-blue-500/35 transition-all overflow-hidden shrink-0">
               <img src="/logo.png" alt="OmniConvert Logo" className="w-full h-full object-cover" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center space-x-1.5">
-                <span className="font-display font-extrabold text-lg sm:text-xl text-white tracking-tight truncate">
+                <span className="font-display font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white tracking-tight truncate">
                   OmniConvert
                 </span>
-                <span className="font-display px-1.5 py-0.5 text-[9px] sm:text-[10px] font-black rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30 shrink-0">
+                <span className="font-display px-1.5 py-0.5 text-[9px] sm:text-[10px] font-black rounded-lg bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-200/80 dark:border-blue-400/30 shrink-0">
                   v1.0
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-400 font-medium truncate">Personal Local File Suite</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Personal Local File Suite</p>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={onCloseMobile}
-            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 active:bg-white/15 cursor-pointer shrink-0"
+            className="lg:hidden p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 active:bg-slate-200 dark:active:bg-white/15 cursor-pointer shrink-0"
             aria-label="Close navigation menu"
           >
             <X className="w-5 h-5" />
@@ -172,8 +172,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl font-display font-bold text-sm transition-all cursor-pointer ${
                 activeTab === 'convert' && !selectedPreset
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30 ring-1 ring-white/10'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25 ring-1 ring-blue-500/20 dark:ring-white/10'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <LayoutDashboard className="w-5 h-5 shrink-0" />
@@ -211,8 +211,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         }}
                         className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-display font-medium transition-all cursor-pointer group ${
                           isSelected
-                            ? 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-sm shadow-blue-600/25 ring-1 ring-white/10'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-sm shadow-blue-600/25 ring-1 ring-blue-500/20 dark:ring-white/10'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         <div className="flex items-center space-x-2.5">
@@ -220,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             className={`w-4 h-4 transition-transform group-hover:scale-110 ${
                               isSelected
                                 ? 'text-white'
-                                : `${group.accentColor} group-hover:text-white`
+                                : `${group.accentColor} group-hover:text-slate-900 dark:group-hover:text-white`
                             }`}
                           />
                           <span>{tool.label}</span>
@@ -242,7 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Bottom Footer Item: Settings & Options */}
-        <div className="p-4 border-t border-[#1a233a] shrink-0 bg-[#0a1120]">
+        <div className="p-4 border-t border-slate-200/80 dark:border-[#1a233a] shrink-0 bg-slate-50/80 dark:bg-[#0a1120]">
           <button
             type="button"
             onClick={() => {
@@ -251,15 +251,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-display text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'settings'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30'
-                : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <div className="flex items-center space-x-2.5">
-              <Settings className="w-4.5 h-4.5 text-slate-400" />
+              <Settings className="w-4.5 h-4.5 text-slate-400 dark:text-slate-400" />
               <span>Settings & Options</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-500" />
+            <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </button>
         </div>
       </aside>
