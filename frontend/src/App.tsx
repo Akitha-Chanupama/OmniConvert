@@ -8,6 +8,13 @@ import { PdfStudioPage } from './pages/PdfStudioPage';
 import { CommandPalette } from './components/CommandPalette';
 import { GlobalDropOverlay } from './components/GlobalDropOverlay';
 import { ShieldCheck } from 'lucide-react';
+import {
+  getSettings,
+  saveSettings,
+  subscribeSettings,
+  applySettingsToDOM,
+  type AppSettings,
+} from './utils/settingsStore';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'convert' | 'tools' | 'settings' | 'pdf-studio'>('convert');
@@ -26,19 +33,27 @@ export const App: React.FC = () => {
   const [queueCount, setQueueCount] = useState<number>(0);
   const [clearQueueTrigger, setClearQueueTrigger] = useState<number>(0);
 
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    return localStorage.getItem('omniconvert_theme') === 'dark';
-  });
+  // Persistent settings state
+  const [settings, setSettings] = useState<AppSettings>(() => getSettings());
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('omniconvert_theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('omniconvert_theme', 'light');
-    }
-  }, [isDark]);
+    applySettingsToDOM(settings);
+    const unsubscribe = subscribeSettings((updated) => {
+      setSettings(updated);
+    });
+    return unsubscribe;
+  }, []);
+
+  const isDark =
+    settings.theme === 'dark' ||
+    (settings.theme === 'system' &&
+      (typeof window !== 'undefined'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        : false));
+
+  const toggleTheme = () => {
+    saveSettings({ theme: isDark ? 'light' : 'dark' });
+  };
 
   // Global Keyboard Shortcuts (Ctrl + K or / to trigger Command Palette)
   useEffect(() => {
@@ -60,9 +75,6 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  const toggleTheme = () => {
-    setIsDark((prev) => !prev);
-  };
 
   const handleSelectToolPreset = (
     source: string,
