@@ -1,0 +1,23 @@
+services:
+  omniconvert:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: omniconvert-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - APP_MODE=hosted
+      - MAX_UPLOAD_SIZE_MB=50
+      - CLEANUP_INTERVAL_MINUTES=15
+      - CLEANUP_MAX_AGE_MINUTES=30
+      - ALLOW_ALL_ORIGINS=true
+    volumes:
+      - omniconvert-temp:/app/temp
+
+volumes:
+  omniconvert-temp:
+    driver: local
