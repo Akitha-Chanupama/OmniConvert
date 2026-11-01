@@ -7,6 +7,10 @@ import { SettingsPage } from './pages/SettingsPage';
 import { PdfStudioPage } from './pages/PdfStudioPage';
 import { CommandPalette } from './components/CommandPalette';
 import { GlobalDropOverlay } from './components/GlobalDropOverlay';
+import { ConversionHistoryDrawer } from './components/ConversionHistoryDrawer';
+import { PasteSnippetModal } from './components/PasteSnippetModal';
+import { getStoredHistory, subscribeHistory } from './utils/historyStore';
+import { usePwaInstall } from './utils/usePwaInstall';
 import { ShieldCheck } from 'lucide-react';
 import {
   getSettings,
@@ -24,6 +28,15 @@ export const App: React.FC = () => {
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isPasteSnippetOpen, setIsPasteSnippetOpen] = useState(false);
+  const [historyCount, setHistoryCount] = useState<number>(() => getStoredHistory().length);
+  const { isInstallable, installApp } = usePwaInstall();
+
+  useEffect(() => {
+    setHistoryCount(getStoredHistory().length);
+    return subscribeHistory((records) => setHistoryCount(records.length));
+  }, []);
 
   // Dedicated file for PDF Studio
   const [pdfStudioFile, setPdfStudioFile] = useState<File | null>(null);
@@ -102,6 +115,12 @@ export const App: React.FC = () => {
     setSelectedPresetId(null);
   };
 
+  const handleSnippetReady = (file: File, suggestedTarget: string) => {
+    setDroppedFiles([file]);
+    setPresetTarget(suggestedTarget);
+    setActiveTab('convert');
+  };
+
   const handleSelectPdfStudio = (fileToLoad?: File) => {
     if (fileToLoad) {
       setPdfStudioFile(fileToLoad);
@@ -138,6 +157,19 @@ export const App: React.FC = () => {
       {/* Global Full-Screen Drag & Drop Aura Overlay */}
       <GlobalDropOverlay onFilesDropped={handleGlobalFilesDropped} />
 
+      {/* Conversion History Slide-over Drawer */}
+      <ConversionHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+      />
+
+      {/* Paste Raw Text or Code Snippet Modal */}
+      <PasteSnippetModal
+        isOpen={isPasteSnippetOpen}
+        onClose={() => setIsPasteSnippetOpen(false)}
+        onSnippetReady={handleSnippetReady}
+      />
+
       {/* Spotlight Command Palette Modal */}
       <CommandPalette
         isOpen={isCommandPaletteOpen}
@@ -154,6 +186,10 @@ export const App: React.FC = () => {
         onNavigateToSettings={handleSelectSettings}
         onClearQueue={() => setClearQueueTrigger((prev) => prev + 1)}
         hasQueueFiles={queueCount > 0}
+        onOpenPasteSnippet={() => setIsPasteSnippetOpen(true)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        onInstallApp={installApp}
+        isInstallable={isInstallable}
       />
 
       {/* Persistent Left Sidebar */}
@@ -177,6 +213,11 @@ export const App: React.FC = () => {
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onSelectTool={handleSelectToolPreset}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          onOpenPasteSnippet={() => setIsPasteSnippetOpen(true)}
+          onOpenHistory={() => setIsHistoryOpen(true)}
+          historyCount={historyCount}
+          isInstallable={isInstallable}
+          onInstallApp={installApp}
         />
 
         {/* Content Canvas */}
@@ -197,6 +238,7 @@ export const App: React.FC = () => {
               onClearExternalFiles={() => setDroppedFiles(null)}
               onQueueChange={setQueueCount}
               clearQueueTrigger={clearQueueTrigger}
+              onOpenPasteSnippet={() => setIsPasteSnippetOpen(true)}
             />
           )}
 

@@ -1,5 +1,14 @@
 import React from 'react';
-import { Search, Sun, Moon, ShieldCheck, Menu } from 'lucide-react';
+import {
+  Search,
+  Sun,
+  Moon,
+  ShieldCheck,
+  Menu,
+  Sparkles,
+  History,
+  Download,
+} from 'lucide-react';
 
 interface TopHeaderProps {
   isDark: boolean;
@@ -7,6 +16,11 @@ interface TopHeaderProps {
   onOpenMobileMenu: () => void;
   onSelectTool: (source: string, target: string, action?: 'convert' | 'merge_pdf' | 'split_pdf') => void;
   onOpenCommandPalette: () => void;
+  onOpenPasteSnippet?: () => void;
+  onOpenHistory?: () => void;
+  historyCount?: number;
+  isInstallable?: boolean;
+  onInstallApp?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -14,9 +28,14 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onToggleTheme,
   onOpenMobileMenu,
   onOpenCommandPalette,
+  onOpenPasteSnippet,
+  onOpenHistory,
+  historyCount = 0,
+  isInstallable = false,
+  onInstallApp,
 }) => {
   return (
-    <header className="h-16 sm:h-20 px-3.5 sm:px-8 flex items-center justify-between gap-2.5 sm:gap-4 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-[#070b16]/70 backdrop-blur-md sticky top-0 z-30 transition-colors">
+    <header className="h-16 sm:h-20 px-3.5 sm:px-8 flex items-center justify-between gap-2 sm:gap-4 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-[#070b16]/70 backdrop-blur-md sticky top-0 z-30 transition-colors">
       {/* Left: Mobile Menu Toggle & Global Tool Search Trigger */}
       <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0 max-w-xl">
         <button
@@ -58,8 +77,52 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Theme Toggle & Live Engine Badge */}
-      <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+      {/* Right Actions: Paste Snippet, History, Install App, Theme Toggle, Engine Status */}
+      <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+        {/* Quick Paste Snippet Button */}
+        {onOpenPasteSnippet && (
+          <button
+            type="button"
+            onClick={onOpenPasteSnippet}
+            className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 transition-all cursor-pointer shadow-2xs"
+            title="Paste raw text, Markdown, or JSON snippet to convert"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+            <span>Paste Snippet</span>
+          </button>
+        )}
+
+        {/* History Drawer Trigger */}
+        {onOpenHistory && (
+          <button
+            type="button"
+            onClick={onOpenHistory}
+            className="relative p-2 sm:p-2.5 rounded-full border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-2xs transition-all cursor-pointer"
+            title="Conversion History"
+            aria-label="Open conversion history"
+          >
+            <History className="w-4 h-4" />
+            {historyCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 text-white text-[9px] font-extrabold flex items-center justify-center shadow-xs">
+                {historyCount > 9 ? '9+' : historyCount}
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* PWA Install Button (Displays when browser signals installability) */}
+        {isInstallable && onInstallApp && (
+          <button
+            type="button"
+            onClick={onInstallApp}
+            className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 shadow-2xs transition-all cursor-pointer animate-in fade-in"
+            title="Install OmniConvert Desktop App"
+          >
+            <Download className="w-3.5 h-3.5 text-blue-500" />
+            <span className="hidden sm:inline">Install App</span>
+          </button>
+        )}
+
         {/* Sun/Moon Theme Toggle */}
         <button
           type="button"
@@ -85,8 +148,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Live Engine Status Badge */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/70 rounded-full text-xs font-semibold font-display font-bold text-emerald-700 dark:text-emerald-400 shadow-2xs ring-1 ring-emerald-500/10 shrink-0">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-          <span className="hidden sm:inline">Conversion Engine Active</span>
-          <span className="sm:hidden font-bold">Active</span>
+          <span className="hidden lg:inline">Conversion Engine Active</span>
+          <span className="lg:hidden font-bold">Active</span>
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
         </div>
       </div>

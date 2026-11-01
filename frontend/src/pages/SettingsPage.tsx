@@ -19,7 +19,12 @@ import {
   FileCheck,
   Layers,
   Palette,
+  Volume2,
+  VolumeX,
+  Download,
 } from 'lucide-react';
+import { playSuccessChime } from '../utils/soundEffects';
+import { usePwaInstall } from '../utils/usePwaInstall';
 import { ConversionApi } from '../services/conversionApi';
 import type { HealthResponse } from '../types';
 import {
@@ -39,6 +44,7 @@ export const SettingsPage: React.FC = () => {
 
   // Settings State
   const [settings, setSettings] = useState<AppSettings>(() => getSettings());
+  const { isInstallable, isInstalled, installApp } = usePwaInstall();
   const [activeCategory, setActiveCategory] = useState<'appearance' | 'defaults' | 'storage' | 'diagnostics'>('appearance');
   const [savedNotification, setSavedNotification] = useState<string | null>(null);
 
@@ -340,6 +346,52 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Audio Cues & Sound Effects */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/50 dark:border-amber-800/50">
+                  {settings.soundEffects ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">
+                    Audio Cues & Completion Chimes
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Play a gentle synthesized audio chime when batch conversions finish
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => playSuccessChime(true)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                  title="Test chime sound"
+                >
+                  Test Chime
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleUpdate(
+                      { soundEffects: !settings.soundEffects },
+                      settings.soundEffects ? 'Audio chimes muted.' : 'Audio chimes enabled.'
+                    )
+                  }
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer border ${
+                    settings.soundEffects
+                      ? 'bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                  }`}
+                >
+                  {settings.soundEffects ? 'Sound: Active' : 'Sound: Muted'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -533,6 +585,52 @@ export const SettingsPage: React.FC = () => {
               >
                 Clear Cache Now
               </button>
+            </div>
+          </div>
+
+          {/* Desktop Application & PWA Installation */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/50 dark:border-blue-800/50">
+                <Download className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">
+                  Desktop Application & Offline Shell
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Run OmniConvert as a dedicated standalone desktop app
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">
+                  {isInstalled ? 'OmniConvert Desktop App Active' : isInstallable ? 'Install OmniConvert Desktop App' : 'Progressive Web App Ready'}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {isInstalled
+                    ? 'Running in standalone window mode with cached shell assets and offline recovery.'
+                    : 'Install directly to your taskbar or application menu for faster, distraction-free conversions.'}
+                </p>
+              </div>
+
+              {isInstallable && (
+                <button
+                  type="button"
+                  onClick={installApp}
+                  className="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0 flex items-center space-x-1.5"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Install App</span>
+                </button>
+              )}
+              {isInstalled && (
+                <span className="px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl border border-emerald-200/80 dark:border-emerald-800/80 shrink-0">
+                  Installed ✓
+                </span>
+              )}
             </div>
           </div>
 
