@@ -433,24 +433,24 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* Left Column (7 Columns): Upload Stage & File Queue + Quick Actions */}
         <div className="lg:col-span-7 space-y-6">
           {/* Main Dropzone Card */}
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-5">
-            <div className="flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4.5 sm:p-7 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] backdrop-blur-sm space-y-4 sm:space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
                   <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white">
+                  <h2 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                     Select or Drop Files
                   </h2>
-                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                  <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500">
                     Upload one or more files to convert in parallel or merge
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <span className="font-display px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80">
+              <div className="flex items-center justify-between sm:justify-end space-x-2 w-full sm:w-auto">
+                <span className="font-display px-2.5 sm:px-3 py-1 sm:py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80">
                   {files.length} file{files.length === 1 ? '' : 's'} selected
                 </span>
                 {files.length > 0 && (

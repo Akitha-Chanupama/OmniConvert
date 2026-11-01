@@ -141,13 +141,13 @@ export const FileCard: React.FC<FileCardProps> = ({
   }, []);
 
   return (
-    <div className="relative group flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] hover:border-blue-400 dark:hover:border-slate-700 hover:shadow-md transition-all">
-      {/* Left: Thumbnail & File Metadata */}
-      <div className="flex items-center space-x-3.5 min-w-0 flex-1 mr-3">
+    <div className="relative group flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] hover:border-blue-400 dark:hover:border-slate-700 hover:shadow-md transition-all gap-3">
+      {/* Top / Left: Thumbnail & File Metadata */}
+      <div className="flex items-center space-x-3 sm:space-x-3.5 min-w-0 flex-1">
         {/* Live Thumbnail / Rich Icon Badge */}
         <div
           onClick={() => onPreview && onPreview(item)}
-          className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border shadow-xs transition-transform duration-200 ${
+          className={`relative w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border shadow-xs transition-transform duration-200 ${
             theme.iconBg
           } ${onPreview ? 'cursor-pointer hover:scale-105' : ''}`}
           title={onPreview ? 'Click to preview' : undefined}
@@ -164,7 +164,7 @@ export const FileCard: React.FC<FileCardProps> = ({
               </div>
             </>
           ) : (
-            <IconComp className="w-6 h-6 sm:w-7 sm:h-7" />
+            <IconComp className="w-5 h-5 sm:w-7 sm:h-7" />
           )}
         </div>
 
@@ -175,7 +175,7 @@ export const FileCard: React.FC<FileCardProps> = ({
               className="text-xs sm:text-sm font-bold font-display text-slate-900 dark:text-slate-100 truncate"
               title={item.name}
             >
-              {truncateFilename(item.name, 38)}
+              {truncateFilename(item.name, 50)}
             </p>
           </div>
 
@@ -202,8 +202,8 @@ export const FileCard: React.FC<FileCardProps> = ({
         </div>
       </div>
 
-      {/* Right: Per-File Target Selector & Action Controls */}
-      <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+      {/* Bottom / Right: Per-File Target Selector & Action Controls */}
+      <div className="flex items-center justify-between sm:justify-end space-x-2 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
         {/* Per-File Target Format Dropdown Selector */}
         {effectiveTarget && (
           <div ref={dropdownRef} className="relative">
@@ -228,7 +228,7 @@ export const FileCard: React.FC<FileCardProps> = ({
 
             {/* Target Options Popover */}
             {dropdownOpen && availableTargets.length > 1 && (
-              <div className="absolute right-0 top-full mt-1.5 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl ring-1 ring-black/[0.08] dark:ring-white/[0.08] overflow-hidden z-40 p-1.5 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-1.5 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl ring-1 ring-black/[0.08] dark:ring-white/[0.08] overflow-hidden z-40 p-1.5 animate-in fade-in zoom-in-95 duration-100">
                 <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Target Format
                 </div>
@@ -266,7 +266,7 @@ export const FileCard: React.FC<FileCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenPdfStudio(item.file)}
-              className="px-2 py-1 bg-violet-50 dark:bg-violet-950/70 text-violet-600 dark:text-violet-300 hover:bg-violet-100 rounded-lg text-[11px] font-bold border border-violet-200 dark:border-violet-800 transition-colors flex items-center space-x-1 cursor-pointer mr-1"
+              className="px-2.5 py-1.5 bg-violet-50 dark:bg-violet-950/70 text-violet-600 dark:text-violet-300 hover:bg-violet-100 rounded-xl text-xs font-bold border border-violet-200 dark:border-violet-800 transition-colors flex items-center space-x-1 cursor-pointer mr-0.5"
               title="Open in PDF Visual Studio to reorder, rotate & extract pages"
             >
               <Layers className="w-3.5 h-3.5" />
@@ -294,7 +294,7 @@ export const FileCard: React.FC<FileCardProps> = ({
                   type="button"
                   onClick={onMoveUp}
                   disabled={disabled}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                   title="Move up in queue"
                 >
                   <ChevronUp className="w-3.5 h-3.5" />
@@ -305,7 +305,7 @@ export const FileCard: React.FC<FileCardProps> = ({
                   type="button"
                   onClick={onMoveDown}
                   disabled={disabled}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                   title="Move down in queue"
                 >
                   <ChevronDown className="w-3.5 h-3.5" />

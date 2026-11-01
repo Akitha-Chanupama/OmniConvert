@@ -65,7 +65,7 @@ export const SettingsPage: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* Server Status Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-4.5 sm:p-7 shadow-xs space-y-4 sm:space-y-5">
             <div className="flex items-center space-x-3 text-slate-900 dark:text-white font-bold text-base">
               <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                 <Server className="w-5 h-5" />
@@ -78,7 +78,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 text-xs">
               <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <span className="text-slate-400 dark:text-slate-400 block mb-1">Status</span>
                 <span className="font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">

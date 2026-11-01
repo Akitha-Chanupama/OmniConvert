@@ -326,7 +326,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setCompareMode('split')}
-                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
                     compareMode === 'split'
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -334,12 +334,13 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                   title="Interactive split comparison slider"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>Split Slider</span>
+                  <span className="hidden sm:inline">Split Slider</span>
+                  <span className="sm:hidden">Split</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompareMode('side')}
-                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
                     compareMode === 'side'
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -348,11 +349,12 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                 >
                   <Columns2 className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Side-by-Side</span>
+                  <span className="sm:hidden">Side</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCompareMode('single')}
-                  className={`px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-lg flex items-center space-x-1 cursor-pointer transition-colors ${
                     compareMode === 'single'
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs font-bold'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -360,7 +362,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                   title="Single image view"
                 >
                   <Eye className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Single</span>
+                  <span>Single</span>
                 </button>
               </div>
             )}
